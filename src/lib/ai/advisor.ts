@@ -1,13 +1,17 @@
 import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
 /* ============================================================
-   Radar Digital — AI advisor (Claude)
-   "Specialized" not by fine-tuning but by grounding Claude in our
-   framework (the 8 dimensions, maturity levels, consulting method)
-   via a cached system prompt. Streams the answer back.
+   Radar Digital — AI advisor (multi-provider)
+   "Specialized" not by fine-tuning but by grounding the model in our
+   framework (8 dimensions, maturity levels, consulting method) via a
+   system prompt. Auto-detects whichever API key is present:
+     - Claude (Anthropic)        — best quality, paid
+     - Gemini (Google AI Studio) — FREE tier, recommended
+     - Groq (Llama)              — FREE, very fast
+     - OpenRouter                — has :free models
+   Gemini/Groq/OpenRouter are called through their OpenAI-compatible API.
    ============================================================ */
-
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
 
 const SYSTEM = `Eres un consultor senior en transformación digital que acompaña a emprendimientos y pymes (contexto: Ruta Emprende, Universidad Externado de Colombia). Hablas español claro, cercano y profesional.
 
@@ -36,8 +40,61 @@ Reglas:
 - No inventes datos que no te dieron. Si preguntan algo ajeno al diagnóstico, redirige amablemente.
 - Al final, invita a seguir la conversación con preguntas de seguimiento.`;
 
+interface ProviderConfig {
+  kind: "anthropic" | "openai";
+  apiKey: string;
+  baseURL?: string;
+  model: string;
+  label: string;
+}
+
+/** Pick a provider based on which API key is configured (Claude first). */
+function detectProvider(): ProviderConfig | null {
+  if (process.env.ANTHROPIC_API_KEY) {
+    return {
+      kind: "anthropic",
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: process.env.ANTHROPIC_MODEL || "claude-opus-4-8",
+      label: "Claude",
+    };
+  }
+  const googleKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  if (googleKey) {
+    return {
+      kind: "openai",
+      apiKey: googleKey,
+      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+      model: process.env.GEMINI_MODEL || "gemini-2.0-flash",
+      label: "Gemini",
+    };
+  }
+  if (process.env.GROQ_API_KEY) {
+    return {
+      kind: "openai",
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: "https://api.groq.com/openai/v1",
+      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+      label: "Groq",
+    };
+  }
+  if (process.env.OPENROUTER_API_KEY) {
+    return {
+      kind: "openai",
+      apiKey: process.env.OPENROUTER_API_KEY,
+      baseURL: "https://openrouter.ai/api/v1",
+      model: process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+      label: "OpenRouter",
+    };
+  }
+  return null;
+}
+
 export function isAdvisorConfigured(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+  return detectProvider() !== null;
+}
+
+export function advisorLabel(): string {
+  return detectProvider()?.label ?? "";
 }
 
 export interface AdvisorResult {
@@ -53,28 +110,65 @@ export interface AdvisorMessage {
   content: string;
 }
 
-export function streamAdvisor(result: AdvisorResult, history: AdvisorMessage[]) {
-  const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
-
+function buildContext(result: AdvisorResult, history: AdvisorMessage[]): string {
   const dims = [...result.dimensions]
     .sort((a, b) => a.score - b.score)
     .map((d) => `- ${d.name}: ${d.score.toFixed(1)}/10`)
     .join("\n");
 
-  const context =
+  return (
     `Empresa: ${result.company?.trim() || "(sin nombre)"}` +
     (result.sector ? ` · Sector: ${result.sector}` : "") +
     `\nPuntaje global: ${result.overall.toFixed(1)}/10 — Nivel ${result.levelName}.\n` +
     `Puntajes por dimensión (de menor a mayor):\n${dims}\n\n` +
     (history.length === 0
       ? "Genera el diagnóstico y el plan de acción para esta empresa."
-      : "Usa estos resultados como contexto para responder la conversación.");
+      : "Usa estos resultados como contexto para responder la conversación.")
+  );
+}
 
-  return client.messages.stream({
-    model: MODEL,
+/** Provider-agnostic text stream of the advisor's answer. */
+export async function* streamAdvisorText(
+  result: AdvisorResult,
+  history: AdvisorMessage[],
+): AsyncGenerator<string> {
+  const cfg = detectProvider();
+  if (!cfg) return;
+
+  const context = buildContext(result, history);
+
+  if (cfg.kind === "anthropic") {
+    const client = new Anthropic({ apiKey: cfg.apiKey });
+    const stream = client.messages.stream({
+      model: cfg.model,
+      max_tokens: 3000,
+      thinking: { type: "adaptive" },
+      system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
+      messages: [{ role: "user", content: context }, ...history],
+    });
+    for await (const event of stream) {
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+        yield event.delta.text;
+      }
+    }
+    return;
+  }
+
+  // OpenAI-compatible (Gemini / Groq / OpenRouter)
+  const client = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL });
+  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    { role: "system", content: SYSTEM },
+    { role: "user", content: context },
+    ...history.map((m) => ({ role: m.role, content: m.content })),
+  ];
+  const stream = await client.chat.completions.create({
+    model: cfg.model,
     max_tokens: 3000,
-    thinking: { type: "adaptive" },
-    system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-    messages: [{ role: "user", content: context }, ...history],
+    stream: true,
+    messages,
   });
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta?.content;
+    if (delta) yield delta;
+  }
 }

@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 import {
   isAdvisorConfigured,
-  streamAdvisor,
+  streamAdvisorText,
   type AdvisorMessage,
   type AdvisorResult,
 } from "@/lib/ai/advisor";
@@ -62,18 +62,13 @@ export async function POST(req: NextRequest) {
     .map((m) => ({ role: m.role, content: m.content.slice(0, 4000) }));
 
   try {
-    const stream = streamAdvisor(result, history);
+    const gen = streamAdvisorText(result, history);
     const encoder = new TextEncoder();
     const readable = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
-          for await (const event of stream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              controller.enqueue(encoder.encode(event.delta.text));
-            }
+          for await (const text of gen) {
+            controller.enqueue(encoder.encode(text));
           }
           controller.close();
         } catch (err) {

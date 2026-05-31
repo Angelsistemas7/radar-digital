@@ -176,7 +176,7 @@ export function AiAdvisor({
           </span>
           <div>
             <h2 className="font-bold tracking-tight">Asesor con IA</h2>
-            <p className="text-xs text-faint">Diagnóstico conversacional · Claude</p>
+            <p className="text-xs text-faint">Diagnóstico conversacional</p>
           </div>
         </div>
 
@@ -185,10 +185,11 @@ export function AiAdvisor({
             <KeyRound className="mt-0.5 size-5 shrink-0 text-warning" />
             <div className="text-muted">
               <p className="font-semibold text-warning">Asesor con IA no activado</p>
-              Define <code className="text-foreground">ANTHROPIC_API_KEY</code> en{" "}
+              Agrega una API key (gratis con{" "}
+              <code className="text-foreground">GEMINI_API_KEY</code> o{" "}
+              <code className="text-foreground">GROQ_API_KEY</code>) en{" "}
               <code className="text-foreground">.env.local</code> para habilitarlo.
-              Mientras tanto, arriba tienes el diagnóstico y el plan generados por
-              reglas.
+              Mientras tanto, arriba tienes el diagnóstico y el plan por reglas.
             </div>
           </div>
         ) : !started ? (
