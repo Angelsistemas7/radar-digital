@@ -16,6 +16,7 @@ export interface RadarDatum {
  */
 export function RadarChart({
   data,
+  compare,
   max = 10,
   size = 360,
   showLabels = true,
@@ -23,6 +24,7 @@ export function RadarChart({
   animate = true,
 }: {
   data: RadarDatum[];
+  compare?: RadarDatum[];
   max?: number;
   size?: number;
   showLabels?: boolean;
@@ -107,6 +109,18 @@ export function RadarChart({
           </g>
         );
       })}
+
+      {/* comparison series (e.g. sector average) — dashed outline */}
+      {compare && compare.length === data.length && (
+        <polygon
+          points={compare.map((d, i) => pointFor(i, d.value).join(",")).join(" ")}
+          fill="none"
+          stroke="#94a3b8"
+          strokeWidth={1.5}
+          strokeDasharray="5 4"
+          strokeLinejoin="round"
+        />
+      )}
 
       {/* data shape — scales in from the chart center */}
       <motion.g

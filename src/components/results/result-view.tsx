@@ -11,12 +11,13 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
-import { RadarChart } from "./radar-chart";
+import { RadarChart, type RadarDatum } from "./radar-chart";
 import { AiAdvisor } from "./ai-advisor";
 import { DimensionIcon } from "@/components/ui/dimension-icon";
 import { Reveal } from "@/components/ui/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
+import { downloadReport } from "@/lib/pdf";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
 import { cn, formatScore } from "@/lib/utils";
 import type { AssessmentResult, DimensionScore, RecommendationBand } from "@/lib/types";
@@ -125,6 +126,28 @@ const PRIORITY_TAG = {
   baja: "bg-success/15 text-success",
 } as const;
 
+function Widget({
+  label,
+  value,
+  sub,
+  color,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  color: string;
+}) {
+  return (
+    <div className="glass rounded-2xl p-4">
+      <p className="text-xs text-faint">{label}</p>
+      <p className="mt-1 truncate text-base font-bold" style={{ color }}>
+        {value}
+      </p>
+      {sub && <p className="truncate text-xs text-muted">{sub}</p>}
+    </div>
+  );
+}
+
 export function ResultView({
   result,
   company,
@@ -142,6 +165,38 @@ export function ResultView({
     value: d.score,
     color: d.color,
   }));
+
+  const [compare, setCompare] = useState<RadarDatum[] | null>(null);
+  const [compareOverall, setCompareOverall] = useState<number | null>(null);
+  const [showCompare, setShowCompare] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/benchmark?sector=${encodeURIComponent(sector ?? "")}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (d: {
+          overall?: number;
+          dimensions?: { dimensionId: string; avg: number }[];
+        } | null) => {
+          if (!active || !d?.dimensions) return;
+          const byId = new Map(d.dimensions.map((x) => [x.dimensionId, x.avg]));
+          setCompare(
+            result.dimensions.map((dim) => ({
+              label: dim.name,
+              value: byId.get(dim.dimensionId) ?? 0,
+              color: dim.color,
+            })),
+          );
+          setCompareOverall(typeof d.overall === "number" ? d.overall : null);
+        },
+      )
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sector]);
 
   return (
     <div className="space-y-6">
@@ -213,12 +268,80 @@ export function ResultView({
         </div>
       </Reveal>
 
+      {/* widgets */}
+      <Reveal className="print:hidden">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Widget
+            label="Nivel de madurez"
+            value={result.level.name}
+            color={result.level.color}
+          />
+          <Widget
+            label="Más fuerte"
+            value={result.strengths[0]?.name ?? "—"}
+            sub={`${formatScore(result.strengths[0]?.score ?? 0)}/10`}
+            color="#34d399"
+          />
+          <Widget
+            label="A reforzar"
+            value={result.weaknesses[0]?.name ?? "—"}
+            sub={`${formatScore(result.weaknesses[0]?.score ?? 0)}/10`}
+            color="#fb7185"
+          />
+          <Widget
+            label="Vs tu sector"
+            value={
+              compareOverall != null
+                ? `${result.overall >= compareOverall ? "+" : ""}${formatScore(result.overall - compareOverall)}`
+                : "—"
+            }
+            sub={
+              compareOverall != null
+                ? `sector: ${formatScore(compareOverall)}/10`
+                : "calculando…"
+            }
+            color="#22d3ee"
+          />
+        </div>
+      </Reveal>
+
       {/* radar + bars */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Reveal>
           <div className="glass h-full rounded-3xl p-6">
-            <h2 className="mb-2 text-lg font-semibold">Tu radar digital</h2>
-            <RadarChart data={radarData} size={380} />
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold">Tu radar digital</h2>
+              {compare && (
+                <button
+                  type="button"
+                  onClick={() => setShowCompare((s) => !s)}
+                  className={cn(
+                    "no-print rounded-lg border px-2.5 py-1 text-xs font-medium transition",
+                    showCompare
+                      ? "border-accent/40 bg-accent/10 text-accent"
+                      : "border-border text-muted hover:text-foreground",
+                  )}
+                >
+                  {showCompare ? "Ocultar" : "Comparar"} sector
+                </button>
+              )}
+            </div>
+            <RadarChart
+              data={radarData}
+              compare={showCompare ? (compare ?? undefined) : undefined}
+              size={380}
+            />
+            {compare && showCompare && (
+              <div className="no-print mt-2 flex items-center justify-center gap-4 text-xs text-muted">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-3 rounded-full bg-primary" /> Tu empresa
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-0 w-3 border-t-2 border-dashed border-[#94a3b8]" />{" "}
+                  Promedio del sector
+                </span>
+              </div>
+            )}
           </div>
         </Reveal>
         <Reveal delay={0.08}>
@@ -441,10 +564,10 @@ export function ResultView({
           <div className="flex shrink-0 gap-3">
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() => downloadReport(result, company, sector)}
               className={buttonClasses("secondary", "md")}
             >
-              <Download className="size-4" /> Descargar (PDF)
+              <Download className="size-4" /> Descargar PDF
             </button>
             {onRestart && (
               <button
