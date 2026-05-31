@@ -124,8 +124,15 @@ export function AiAdvisor({
         return;
       }
       if (!res.ok || !res.body) {
-        const j = (await res.json().catch(() => ({}))) as { error?: string };
-        setError(j.error ?? "No se pudo generar la respuesta.");
+        const j = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          detail?: string;
+        };
+        setError(
+          j.detail
+            ? `${j.error ?? "Error"} (${j.detail})`
+            : (j.error ?? "No se pudo generar la respuesta."),
+        );
         setStreaming(null);
         setLoading(false);
         return;

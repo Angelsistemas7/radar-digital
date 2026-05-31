@@ -1,6 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
-import { GoogleGenAI } from "@google/genai";
 
 /* ============================================================
    Radar Digital — AI advisor (multi-provider)
@@ -155,23 +154,59 @@ export async function* streamAdvisorText(
   }
 
   if (cfg.kind === "gemini") {
-    // Native Google GenAI SDK — works with AI Studio keys (incl. "AQ." format).
-    const ai = new GoogleGenAI({ apiKey: cfg.apiKey });
-    const contents = [
-      { role: "user", parts: [{ text: context }] },
-      ...history.map((m) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      })),
-    ];
-    const stream = await ai.models.generateContentStream({
-      model: cfg.model,
-      contents,
-      config: { systemInstruction: SYSTEM, maxOutputTokens: MAX_TOKENS },
+    // Gemini native REST with API-key auth via ?key= (NOT a Bearer token).
+    // The SDKs send the key as "Authorization: Bearer", which Google rejects
+    // with ACCESS_TOKEN_TYPE_UNSUPPORTED for AI Studio API keys.
+    const url =
+      `https://generativelanguage.googleapis.com/v1beta/models/${cfg.model}:streamGenerateContent` +
+      `?alt=sse&key=${encodeURIComponent(cfg.apiKey)}`;
+    const body = {
+      systemInstruction: { parts: [{ text: SYSTEM }] },
+      contents: [
+        { role: "user", parts: [{ text: context }] },
+        ...history.map((m) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content }],
+        })),
+      ],
+      generationConfig: { maxOutputTokens: MAX_TOKENS },
+    };
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
-    for await (const chunk of stream) {
-      const text = chunk.text;
-      if (text) yield text;
+    if (!res.ok || !res.body) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`Gemini ${res.status}: ${errText.slice(0, 300)}`);
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let nl: number;
+      while ((nl = buffer.indexOf("\n")) >= 0) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === "[DONE]") continue;
+        try {
+          const obj = JSON.parse(payload) as {
+            candidates?: { content?: { parts?: { text?: string }[] } }[];
+          };
+          const text =
+            obj.candidates?.[0]?.content?.parts
+              ?.map((p) => p.text ?? "")
+              .join("") ?? "";
+          if (text) yield text;
+        } catch {
+          /* ignore partial JSON chunks */
+        }
+      }
     }
     return;
   }

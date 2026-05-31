@@ -70,10 +70,11 @@ export async function POST(req: NextRequest) {
     first = await gen.next();
   } catch (err) {
     console.error("Asesor IA error:", err);
+    const detail = err instanceof Error ? err.message : String(err);
     return Response.json(
       {
-        error:
-          "El proveedor de IA rechazó la solicitud. Revisa la API key o el modelo.",
+        error: "El proveedor de IA rechazó la solicitud.",
+        detail: detail.slice(0, 600),
       },
       { status: 502 },
     );
