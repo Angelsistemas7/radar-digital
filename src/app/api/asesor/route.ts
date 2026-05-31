@@ -61,31 +61,45 @@ export async function POST(req: NextRequest) {
     .slice(-12)
     .map((m) => ({ role: m.role, content: m.content.slice(0, 4000) }));
 
+  const gen = streamAdvisorText(result, history);
+
+  // Pull the first chunk eagerly so provider errors (bad key, model, etc.)
+  // return a clean JSON error instead of a broken stream.
+  let first: IteratorResult<string>;
   try {
-    const gen = streamAdvisorText(result, history);
-    const encoder = new TextEncoder();
-    const readable = new ReadableStream<Uint8Array>({
-      async start(controller) {
-        try {
-          for await (const text of gen) {
-            controller.enqueue(encoder.encode(text));
-          }
-          controller.close();
-        } catch (err) {
-          controller.error(err);
-        }
-      },
-    });
-    return new Response(readable, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-store",
-      },
-    });
-  } catch {
+    first = await gen.next();
+  } catch (err) {
+    console.error("Asesor IA error:", err);
     return Response.json(
-      { error: "No se pudo generar el diagnóstico con IA." },
-      { status: 500 },
+      {
+        error:
+          "El proveedor de IA rechazó la solicitud. Revisa la API key o el modelo.",
+      },
+      { status: 502 },
     );
   }
+
+  const encoder = new TextEncoder();
+  const readable = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        if (!first.done && first.value) {
+          controller.enqueue(encoder.encode(first.value));
+        }
+        for await (const text of gen) {
+          controller.enqueue(encoder.encode(text));
+        }
+        controller.close();
+      } catch (err) {
+        console.error("Asesor IA stream error:", err);
+        controller.error(err);
+      }
+    },
+  });
+  return new Response(readable, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
 }

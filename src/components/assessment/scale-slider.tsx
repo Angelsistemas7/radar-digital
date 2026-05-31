@@ -61,9 +61,11 @@ export function ScaleSlider({
             type="range"
             min={0}
             max={max}
-            step={1}
+            step={0.1}
             value={current}
-            onChange={(e) => onChange(Number(e.target.value))}
+            onChange={(e) =>
+              onChange(Math.round(Number(e.target.value) * 10) / 10)
+            }
             aria-label="Calificación de 0 a 10"
             className="absolute inset-0 size-full cursor-pointer opacity-0"
           />
@@ -71,14 +73,14 @@ export function ScaleSlider({
 
         {/* value badge */}
         <div
-          className="flex h-11 w-14 shrink-0 items-center justify-center rounded-xl border text-xl font-bold tabular-nums transition-colors"
+          className="flex h-11 w-16 shrink-0 items-center justify-center rounded-xl border text-lg font-bold tabular-nums transition-colors"
           style={{
             color: answered ? color : "#5b6885",
             borderColor: answered ? `${color}55` : "#1e2942",
             backgroundColor: answered ? `${color}14` : "transparent",
           }}
         >
-          {answered ? value : "–"}
+          {answered ? value.toFixed(1) : "–"}
         </div>
       </div>
 

@@ -97,6 +97,8 @@ export interface ActionItem {
   dimensionName: string;
   color: string;
   priority: "alta" | "media" | "baja";
+  score: number;
+  target: number;
   actions: string[];
 }
 

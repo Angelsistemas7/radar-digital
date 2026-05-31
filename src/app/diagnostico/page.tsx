@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function DiagnosticoPage() {
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+      <header className="no-print sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
           <Link href="/" aria-label="Radar Digital — inicio">
             <LogoLockup />

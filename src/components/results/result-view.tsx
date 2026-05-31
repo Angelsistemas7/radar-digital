@@ -145,6 +145,27 @@ export function ResultView({
 
   return (
     <div className="space-y-6">
+      {/* print-only report header */}
+      <div className="mb-6 hidden print:block">
+        <div className="flex items-center justify-between border-b border-[#d9dee8] pb-3">
+          <span className="font-display text-lg font-bold">Radar Digital</span>
+          <span className="text-sm">
+            Reporte de Madurez Digital ·{" "}
+            {new Date().toLocaleDateString("es-CO", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+        </div>
+        {company && (
+          <p className="mt-2 text-sm">
+            Empresa: <strong>{company}</strong>
+            {sector ? ` · Sector: ${sector}` : ""}
+          </p>
+        )}
+      </div>
+
       {/* headline result */}
       <Reveal>
         <div className="glass glow-primary relative overflow-hidden rounded-3xl p-6 sm:p-8">
@@ -281,7 +302,21 @@ export function ResultView({
             {diagnosis.perDimension.map((d) => (
               <div key={d.dimensionId} className="rounded-2xl border border-border/70 bg-surface/40 p-5">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold">{d.name}</h3>
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+                      style={{ backgroundColor: `${d.color}1f`, color: d.color }}
+                    >
+                      <DimensionIcon
+                        name={
+                          QUESTIONNAIRE.dimensions.find((x) => x.id === d.dimensionId)
+                            ?.icon ?? ""
+                        }
+                        className="size-4"
+                      />
+                    </span>
+                    <h3 className="font-semibold">{d.name}</h3>
+                  </div>
                   <span
                     className={cn(
                       "rounded-full px-2.5 py-0.5 text-xs font-medium",
@@ -315,51 +350,71 @@ export function ResultView({
           <p className="mb-6 text-sm text-muted">
             Una hoja de ruta por fases para avanzar de lo urgente a lo estratégico.
           </p>
-          <div className="grid gap-4 lg:grid-cols-3">
-            {diagnosis.plan.map((phase) => (
-              <div key={phase.id} className="rounded-2xl border border-border/70 bg-surface/40 p-5">
-                <div className="flex items-baseline justify-between">
-                  <h3 className="font-display text-lg font-bold text-gradient">
-                    {phase.label}
-                  </h3>
-                </div>
-                <p className="mt-1 text-xs text-faint">{phase.focus}</p>
-                <div className="mt-4 space-y-4">
-                  {phase.items.map((item) => (
-                    <div key={item.dimensionId}>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="size-2.5 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="text-sm font-semibold">{item.dimensionName}</span>
-                        <span
-                          className={cn(
-                            "ml-auto rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
-                            PRIORITY_TAG[item.priority],
-                          )}
-                        >
-                          {item.priority}
-                        </span>
+          <div className="grid gap-5 lg:grid-cols-3">
+            {diagnosis.plan.map((phase, pi) => (
+              <Reveal key={phase.id} delay={pi * 0.1}>
+                <div className="h-full rounded-2xl border border-border/70 bg-surface/40 p-6">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex size-7 items-center justify-center rounded-lg bg-accent/15 text-sm font-bold text-accent">
+                      {pi + 1}
+                    </span>
+                    <h3 className="font-display text-lg font-bold text-gradient">
+                      {phase.label}
+                    </h3>
+                  </div>
+                  <p className="mt-2 text-xs text-faint">{phase.focus}</p>
+                  <div className="mt-5 space-y-5">
+                    {phase.items.map((item) => (
+                      <div
+                        key={item.dimensionId}
+                        className="border-t border-border/50 pt-4 first:border-0 first:pt-0"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="text-sm font-semibold">
+                            {item.dimensionName}
+                          </span>
+                          <span
+                            className={cn(
+                              "ml-auto rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                              PRIORITY_TAG[item.priority],
+                            )}
+                          >
+                            {item.priority}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center gap-1.5 text-xs">
+                          <span className="text-faint">Meta:</span>
+                          <span className="font-semibold" style={{ color: item.color }}>
+                            {formatScore(item.score)} → {formatScore(item.target)}
+                          </span>
+                          <span className="text-faint">/ 10</span>
+                        </div>
+                        <ul className="mt-2.5 space-y-2 pl-5">
+                          {item.actions.map((a, i) => (
+                            <li
+                              key={i}
+                              className="list-disc text-sm leading-relaxed text-muted marker:text-faint"
+                            >
+                              {a}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <ul className="mt-2 space-y-1.5 pl-5">
-                        {item.actions.map((a, i) => (
-                          <li key={i} className="list-disc text-sm text-muted marker:text-faint">
-                            {a}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </Reveal>
 
       {/* AI advisor (conversational) */}
-      <Reveal>
+      <Reveal className="no-print">
         <AiAdvisor
           company={company}
           sector={sector}
@@ -375,7 +430,7 @@ export function ResultView({
       </Reveal>
 
       {/* next steps */}
-      <Reveal>
+      <Reveal className="no-print">
         <div className="glass flex flex-col gap-4 rounded-3xl p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-semibold">¿Quieres avanzar con acompañamiento?</h2>

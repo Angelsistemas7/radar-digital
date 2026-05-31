@@ -1,16 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 
 /* ============================================================
    Radar Digital — AI advisor (multi-provider)
-   "Specialized" not by fine-tuning but by grounding the model in our
-   framework (8 dimensions, maturity levels, consulting method) via a
-   system prompt. Auto-detects whichever API key is present:
+   Grounded in our framework (8 dimensions, maturity levels,
+   consulting method) via a system prompt. Auto-detects the API key:
      - Claude (Anthropic)        — best quality, paid
-     - Gemini (Google AI Studio) — FREE tier, recommended
-     - Groq (Llama)              — FREE, very fast
-     - OpenRouter                — has :free models
-   Gemini/Groq/OpenRouter are called through their OpenAI-compatible API.
+     - Gemini (Google AI Studio) — FREE tier, native SDK (acepta keys "AQ.")
+     - Groq (Llama)              — FREE, very fast (OpenAI-compatible)
+     - OpenRouter                — :free models (OpenAI-compatible)
    ============================================================ */
 
 const SYSTEM = `Eres un consultor senior en transformación digital que acompaña a emprendimientos y pymes (contexto: Ruta Emprende, Universidad Externado de Colombia). Hablas español claro, cercano y profesional.
@@ -28,20 +27,20 @@ Evalúas la madurez digital en 8 dimensiones, cada una en escala 0 a 10:
 Niveles de madurez (sobre 10): Incipiente (0–2), Básico (2–4), En desarrollo (4–6), Avanzado (6–8), Líder Digital (8–10).
 
 Tu tarea cuando recibas los resultados de una empresa:
-- Interpreta sus puntajes con empatía y precisión: qué significan para el negocio.
+- Interpreta sus puntajes con empatía y precisión: qué significan para el negocio y qué riesgos u oportunidades implican.
 - Señala con claridad sus 2–3 debilidades más críticas y por qué importan.
 - Reconoce y apalanca sus fortalezas.
-- Propón un plan de acción accionable por fases (0–3, 3–6 y 6–12 meses), priorizando lo urgente y de mayor impacto. Acciones concretas y realistas para una pyme o emprendimiento, no genéricas.
+- Propón un plan de acción accionable y detallado por fases (0–3, 3–6 y 6–12 meses). Para cada acción indica, cuando aporte: qué hacer, una herramienta o ejemplo concreto, y el resultado esperado. Prioriza lo urgente y de mayor impacto. Acciones realistas para una pyme o emprendimiento, no genéricas.
 
 Reglas:
 - Responde SIEMPRE en español.
-- Sé concreto y conciso. Usa markdown: encabezados cortos (##), listas y **negritas**. Evita el relleno.
+- Sé concreto y con buen nivel de detalle. Usa markdown: encabezados cortos (##), listas y **negritas**. Evita el relleno.
 - Personaliza con el nombre y los puntajes de la empresa.
 - No inventes datos que no te dieron. Si preguntan algo ajeno al diagnóstico, redirige amablemente.
 - Al final, invita a seguir la conversación con preguntas de seguimiento.`;
 
 interface ProviderConfig {
-  kind: "anthropic" | "openai";
+  kind: "anthropic" | "gemini" | "openai";
   apiKey: string;
   baseURL?: string;
   model: string;
@@ -61,9 +60,8 @@ function detectProvider(): ProviderConfig | null {
   const googleKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (googleKey) {
     return {
-      kind: "openai",
+      kind: "gemini",
       apiKey: googleKey,
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
       model: process.env.GEMINI_MODEL || "gemini-2.0-flash",
       label: "Gemini",
     };
@@ -122,10 +120,12 @@ function buildContext(result: AdvisorResult, history: AdvisorMessage[]): string 
     `\nPuntaje global: ${result.overall.toFixed(1)}/10 — Nivel ${result.levelName}.\n` +
     `Puntajes por dimensión (de menor a mayor):\n${dims}\n\n` +
     (history.length === 0
-      ? "Genera el diagnóstico y el plan de acción para esta empresa."
+      ? "Genera el diagnóstico y el plan de acción detallado para esta empresa."
       : "Usa estos resultados como contexto para responder la conversación.")
   );
 }
+
+const MAX_TOKENS = 4000;
 
 /** Provider-agnostic text stream of the advisor's answer. */
 export async function* streamAdvisorText(
@@ -141,7 +141,7 @@ export async function* streamAdvisorText(
     const client = new Anthropic({ apiKey: cfg.apiKey });
     const stream = client.messages.stream({
       model: cfg.model,
-      max_tokens: 3000,
+      max_tokens: MAX_TOKENS,
       thinking: { type: "adaptive" },
       system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: context }, ...history],
@@ -154,7 +154,29 @@ export async function* streamAdvisorText(
     return;
   }
 
-  // OpenAI-compatible (Gemini / Groq / OpenRouter)
+  if (cfg.kind === "gemini") {
+    // Native Google GenAI SDK — works with AI Studio keys (incl. "AQ." format).
+    const ai = new GoogleGenAI({ apiKey: cfg.apiKey });
+    const contents = [
+      { role: "user", parts: [{ text: context }] },
+      ...history.map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      })),
+    ];
+    const stream = await ai.models.generateContentStream({
+      model: cfg.model,
+      contents,
+      config: { systemInstruction: SYSTEM, maxOutputTokens: MAX_TOKENS },
+    });
+    for await (const chunk of stream) {
+      const text = chunk.text;
+      if (text) yield text;
+    }
+    return;
+  }
+
+  // OpenAI-compatible (Groq / OpenRouter)
   const client = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL });
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     { role: "system", content: SYSTEM },
@@ -163,7 +185,7 @@ export async function* streamAdvisorText(
   ];
   const stream = await client.chat.completions.create({
     model: cfg.model,
-    max_tokens: 3000,
+    max_tokens: MAX_TOKENS,
     stream: true,
     messages,
   });

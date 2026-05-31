@@ -167,3 +167,57 @@
   color: transparent;
   animation: var(--animate-shimmer);
 }
+
+/* ============================================================
+   Print / PDF — clean white report.
+   Redefining the tokens flips every utility to print-friendly.
+   ============================================================ */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  :root {
+    --color-background: #ffffff;
+    --color-surface: #ffffff;
+    --color-card: #ffffff;
+    --color-elevated: #f1f4f9;
+    --color-border: #d9dee8;
+    --color-border-strong: #c4ccda;
+    --color-foreground: #0b1020;
+    --color-muted: #39435c;
+    --color-faint: #6b7691;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0b1020 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .glass {
+    background: #ffffff !important;
+    border: 1px solid #d9dee8 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .glow-primary,
+  .glow-accent,
+  .card-hover {
+    box-shadow: none !important;
+  }
+  .bg-grid,
+  .bg-radial-fade {
+    background: none !important;
+  }
+  .text-gradient {
+    background: none !important;
+    -webkit-text-fill-color: #0e7490 !important;
+    color: #0e7490 !important;
+  }
+  section,
+  .glass {
+    break-inside: avoid;
+  }
+}

@@ -18,11 +18,15 @@ function toActionItem(ds: DimensionScore): ActionItem {
   const dim = dimById(ds.dimensionId);
   const band = bandForScore(ds.score);
   const priority = band === "low" ? "alta" : band === "medium" ? "media" : "baja";
+  // Meta: el umbral del siguiente nivel de madurez (2, 4, 6, 8, 10).
+  const target = [2, 4, 6, 8, 10].find((b) => b > ds.score) ?? 10;
   return {
     dimensionId: ds.dimensionId,
     dimensionName: ds.name,
     color: ds.color,
     priority,
+    score: ds.score,
+    target,
     actions: dim.recommendations[band],
   };
 }
