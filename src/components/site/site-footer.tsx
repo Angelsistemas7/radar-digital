@@ -13,8 +13,16 @@ export function SiteFooter() {
           <span className="text-muted">
             © {new Date().getFullYear()} Radar Digital.
           </span>{" "}
+          <Link href="/privacidad" className="underline-offset-4 hover:text-muted hover:underline">
+            Privacidad
+          </Link>
+          {" · "}
+          <Link href="/terminos" className="underline-offset-4 hover:text-muted hover:underline">
+            Términos
+          </Link>
+          {" · "}
           <Link href="/admin" className="underline-offset-4 hover:text-muted hover:underline">
-            Panel administrador
+            Admin
           </Link>
         </p>
       </div>

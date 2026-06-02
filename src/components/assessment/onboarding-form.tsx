@@ -244,8 +244,17 @@ export function OnboardingForm({
             />
             <span className="text-sm text-muted">
               Autorizo el tratamiento de mis datos personales para la medición de
-              madurez digital de mi emprendimiento, conforme a la Ley 1581 de 2012
-              (Habeas Data). Podré solicitar su eliminación en cualquier momento.
+              madurez digital de mi emprendimiento, conforme a la{" "}
+              <a
+                href="/privacidad"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-primary underline"
+              >
+                política de privacidad
+              </a>{" "}
+              (Ley 1581 de 2012). Podré solicitar su eliminación cuando quiera.
             </span>
           </label>
           <FieldError msg={errors.consent?.message} />

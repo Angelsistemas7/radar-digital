@@ -97,7 +97,7 @@ const KEYBOARD_RUNS = [
  */
 export function looksLikeGibberish(raw: string): boolean {
   const s = raw.trim().toLowerCase();
-  if (s.length < 2) return true;
+  if (s.length < 3) return true;
 
   const letters = (s.match(/\p{L}/gu) ?? []).length;
   if (letters < 2) return true;
@@ -110,6 +110,8 @@ export function looksLikeGibberish(raw: string): boolean {
 
   // Short repeated pattern: "asasas", "lalala", "jojojo".
   const compact = s.replace(/\s+/g, "");
+  // Single distinct character ("aa", "aaaa").
+  if (new Set(compact).size <= 1) return true;
   if (/^(.{1,3}?)\1{2,}$/.test(compact)) return true;
 
   // Too few distinct characters for its length.
