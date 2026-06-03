@@ -57,11 +57,11 @@ function ScoreRing({
       <svg width={size} height={size} className="-rotate-90">
         <defs>
           <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#22d3ee" />
-            <stop offset="100%" stopColor="#8b5cf6" />
+            <stop offset="0%" style={{ stopColor: "var(--color-primary)" }} />
+            <stop offset="100%" style={{ stopColor: "var(--color-accent)" }} />
           </linearGradient>
         </defs>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#141d31" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e5e7eb" strokeWidth={stroke} />
         <motion.circle
           cx={size / 2}
           cy={size / 2}
@@ -280,13 +280,13 @@ export function ResultView({
             label="Más fuerte"
             value={result.strengths[0]?.name ?? "—"}
             sub={`${formatScore(result.strengths[0]?.score ?? 0)}/10`}
-            color="#34d399"
+            color="#059669"
           />
           <Widget
             label="A reforzar"
             value={result.weaknesses[0]?.name ?? "—"}
             sub={`${formatScore(result.weaknesses[0]?.score ?? 0)}/10`}
-            color="#fb7185"
+            color="#dc2626"
           />
           <Widget
             label="Vs tu sector"
@@ -300,7 +300,7 @@ export function ResultView({
                 ? `sector: ${formatScore(compareOverall)}/10`
                 : "calculando…"
             }
-            color="#22d3ee"
+            color="#0e7490"
           />
         </div>
       </Reveal>

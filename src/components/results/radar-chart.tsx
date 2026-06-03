@@ -58,8 +58,8 @@ export function RadarChart({
     >
       <defs>
         <radialGradient id={`fill-${gid}`} cx="50%" cy="50%" r="55%">
-          <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.18" />
+          <stop offset="0%" style={{ stopColor: "var(--color-primary)" }} stopOpacity="0.5" />
+          <stop offset="100%" style={{ stopColor: "var(--color-accent)" }} stopOpacity="0.18" />
         </radialGradient>
       </defs>
 
@@ -68,8 +68,8 @@ export function RadarChart({
         <polygon
           key={ri}
           points={data.map((_, i) => pointFor(i, ring * max).join(",")).join(" ")}
-          fill={ri === rings.length - 1 ? "rgba(255,255,255,0.015)" : "none"}
-          stroke="#2c3a5a"
+          fill={ri === rings.length - 1 ? "rgba(15,23,42,0.02)" : "none"}
+          stroke="#e2e8f0"
           strokeOpacity={0.55}
           strokeWidth={1}
         />
@@ -90,7 +90,7 @@ export function RadarChart({
               y1={cy}
               x2={ex}
               y2={ey}
-              stroke="#2c3a5a"
+              stroke="#e2e8f0"
               strokeOpacity={0.5}
               strokeWidth={1}
             />
@@ -134,7 +134,7 @@ export function RadarChart({
         <polygon
           points={dataPolygon}
           fill={`url(#fill-${gid})`}
-          stroke="#22d3ee"
+          style={{ stroke: "var(--color-primary)" }}
           strokeWidth={2}
           strokeLinejoin="round"
         />
@@ -144,8 +144,8 @@ export function RadarChart({
             cx={p[0]}
             cy={p[1]}
             r={4.5}
-            fill={data[i].color ?? "#22d3ee"}
-            stroke="#070a12"
+            fill={data[i].color ?? "#0e7490"}
+            stroke="#ffffff"
             strokeWidth={1.5}
           />
         ))}

@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import type { ScaleAnchor } from "@/lib/types";
 
 function colorFor(v: number): string {
-  if (v <= 2) return "#fb7185";
-  if (v <= 4) return "#fb923c";
-  if (v <= 6) return "#fbbf24";
-  if (v <= 8) return "#4ade80";
-  return "#22d3ee";
+  if (v <= 2) return "#dc2626";
+  if (v <= 4) return "#ea580c";
+  if (v <= 6) return "#d97706";
+  if (v <= 8) return "#16a34a";
+  return "#0e7490";
 }
 
 /** 0-10 slider with a dynamic color that reflects the chosen value. */
@@ -45,7 +45,7 @@ export function ScaleSlider({
             )}
             style={{
               width: `${pct}%`,
-              background: `linear-gradient(90deg, #fb7185, ${color})`,
+              background: `linear-gradient(90deg, #dc2626, ${color})`,
             }}
           />
           {/* thumb */}
@@ -76,7 +76,7 @@ export function ScaleSlider({
           className="flex h-11 w-16 shrink-0 items-center justify-center rounded-xl border text-lg font-bold tabular-nums transition-colors"
           style={{
             color: answered ? color : "#5b6885",
-            borderColor: answered ? `${color}55` : "#1e2942",
+            borderColor: answered ? `${color}55` : "#e5e7eb",
             backgroundColor: answered ? `${color}14` : "transparent",
           }}
         >

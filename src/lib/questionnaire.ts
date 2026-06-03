@@ -29,7 +29,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       tagline: "Punto de partida",
       description:
         "La empresa apenas inicia su camino digital. Predominan los procesos manuales y las decisiones por intuición.",
-      color: "#fb7185",
+      color: "#dc2626",
     },
     {
       id: 2,
@@ -38,7 +38,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       tagline: "Primeros pasos",
       description:
         "Existen esfuerzos digitales aislados, pero aún sin una estrategia que los conecte y potencie.",
-      color: "#fb923c",
+      color: "#ea580c",
     },
     {
       id: 3,
@@ -47,7 +47,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       tagline: "Construyendo capacidades",
       description:
         "La transformación digital avanza en varias áreas, con bases sólidas que falta consolidar e integrar.",
-      color: "#fbbf24",
+      color: "#d97706",
     },
     {
       id: 4,
@@ -56,7 +56,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       tagline: "Ventaja digital",
       description:
         "Lo digital está integrado en la operación y la estrategia, generando valor medible para el negocio.",
-      color: "#4ade80",
+      color: "#16a34a",
     },
     {
       id: 5,
@@ -65,7 +65,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       tagline: "Referente de transformación",
       description:
         "La empresa innova con lo digital, optimiza con datos y marca la pauta en su sector.",
-      color: "#22d3ee",
+      color: "#0e7490",
     },
   ],
   dimensions: [
@@ -74,7 +74,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Estrategia",
       title: "Estrategia Digital",
       icon: "Target",
-      color: "#22d3ee",
+      color: "#0e7490",
       description:
         "Visión, liderazgo y hoja de ruta que guían la transformación digital.",
       questions: [
@@ -118,7 +118,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Cultura",
       title: "Cultura y Talento Digital",
       icon: "Users",
-      color: "#818cf8",
+      color: "#4f46e5",
       description:
         "Competencias, capacitación y cultura de innovación del equipo.",
       questions: [
@@ -162,7 +162,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Cliente",
       title: "Experiencia del Cliente",
       icon: "HeartHandshake",
-      color: "#f472b6",
+      color: "#db2777",
       description:
         "Canales digitales, escucha y personalización en la relación con el cliente.",
       questions: [
@@ -206,7 +206,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Procesos",
       title: "Procesos y Operaciones",
       icon: "Workflow",
-      color: "#fbbf24",
+      color: "#d97706",
       description:
         "Digitalización, automatización e integración de la operación.",
       questions: [
@@ -250,7 +250,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Tecnología",
       title: "Tecnología e Infraestructura",
       icon: "Server",
-      color: "#38bdf8",
+      color: "#0284c7",
       description: "Infraestructura, nube y capacidad para escalar.",
       questions: [
         {
@@ -293,7 +293,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Datos",
       title: "Datos y Analítica",
       icon: "Database",
-      color: "#a78bfa",
+      color: "#7c3aed",
       description: "Captura, calidad y uso de datos para tomar decisiones.",
       questions: [
         {
@@ -336,7 +336,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Innovación",
       title: "Innovación y Modelo de Negocio",
       icon: "Rocket",
-      color: "#34d399",
+      color: "#059669",
       description: "Nuevos productos, ingresos digitales y agilidad de negocio.",
       questions: [
         {
@@ -379,7 +379,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Ciberseguridad",
       title: "Ciberseguridad y Protección de Datos",
       icon: "ShieldCheck",
-      color: "#fb7185",
+      color: "#dc2626",
       description:
         "Protección de la información y cumplimiento (Habeas Data).",
       questions: [

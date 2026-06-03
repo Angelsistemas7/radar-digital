@@ -46,9 +46,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070a12",
-  colorScheme: "dark",
+  themeColor: "#f6f7f9",
 };
+
+// Set the theme before paint to avoid a flash of the wrong theme.
+const themeScript = `(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -62,6 +64,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>

@@ -2,7 +2,7 @@
 
 /* ============================================================
    Radar Digital — Design tokens (Tailwind v4 @theme)
-   Dark, "radar"-inspired premium palette.
+   Light, professional, editorial palette (deep teal + indigo).
    ============================================================ */
 @theme {
   /* Fonts (variables injected by next/font in layout.tsx) */
@@ -11,53 +11,43 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /* Surfaces */
-  --color-background: #070a12;
-  --color-surface: #0b1020;
-  --color-card: #0f1626;
-  --color-elevated: #141d31;
-  --color-border: #1e2942;
-  --color-border-strong: #2c3a5a;
+  --color-background: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-elevated: #f1f4f8;
+  --color-border: #e6e9ef;
+  --color-border-strong: #d2d8e2;
 
   /* Text */
-  --color-foreground: #e9eefb;
-  --color-muted: #93a0bd;
-  --color-faint: #5b6885;
+  --color-foreground: #0f172a;
+  --color-muted: #51607a;
+  --color-faint: #8b96aa;
 
   /* Brand */
-  --color-primary: #22d3ee;
-  --color-primary-foreground: #04121a;
-  --color-accent: #8b5cf6;
-  --color-accent-foreground: #faf5ff;
+  --color-primary: #0e7490;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #4f46e5;
+  --color-accent-foreground: #ffffff;
 
   /* Semantic */
-  --color-success: #34d399;
-  --color-warning: #fbbf24;
-  --color-danger: #fb7185;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
 
   /* Radii */
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 2rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
 
   /* Ambient animations */
   --animate-float: float 7s ease-in-out infinite;
-  --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
-  --animate-spin-slow: spin 24s linear infinite;
-  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-spin-slow: spin 26s linear infinite;
   --animate-rise: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-14px); }
-}
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  50% { transform: translateY(-12px); }
 }
 @keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
@@ -87,8 +77,7 @@
     letter-spacing: -0.02em;
   }
   ::selection {
-    background: color-mix(in oklab, var(--color-primary) 35%, transparent);
-    color: #ffffff;
+    background: color-mix(in oklab, var(--color-primary) 18%, transparent);
   }
   * {
     scrollbar-width: thin;
@@ -100,121 +89,79 @@
     border-radius: 99px;
     border: 2px solid var(--color-background);
   }
-  *::-webkit-scrollbar-thumb:hover { background: var(--color-faint); }
 }
 
 /* ============================================================
    Reusable utility classes
    ============================================================ */
 .text-gradient {
-  background: linear-gradient(100deg, var(--color-primary), var(--color-accent) 70%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--color-primary);
 }
 
 .bg-grid {
   background-image:
-    linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px);
+    linear-gradient(to right, #e9edf3 1px, transparent 1px),
+    linear-gradient(to bottom, #e9edf3 1px, transparent 1px);
   background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 35%, transparent 100%);
 }
 
 .bg-radial-fade {
-  background:
-    radial-gradient(55% 50% at 50% -5%, color-mix(in oklab, var(--color-primary) 16%, transparent), transparent 70%),
-    radial-gradient(45% 45% at 85% 10%, color-mix(in oklab, var(--color-accent) 14%, transparent), transparent 70%);
+  background: radial-gradient(
+    60% 45% at 50% 0%,
+    color-mix(in oklab, var(--color-primary) 7%, transparent),
+    transparent 70%
+  );
 }
 
+/* "glass" kept as a class name; now a clean white card. */
 .glass {
-  background: color-mix(in oklab, var(--color-card) 82%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in oklab, var(--color-border-strong) 75%, transparent);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 12px 28px -16px rgba(15, 23, 42, 0.12);
 }
 
 .glow-primary {
   box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-primary) 28%, transparent),
-    0 18px 50px -14px color-mix(in oklab, var(--color-primary) 45%, transparent);
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 18px 44px -22px color-mix(in oklab, var(--color-primary) 45%, transparent);
 }
 .glow-accent {
   box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-accent) 28%, transparent),
-    0 18px 50px -14px color-mix(in oklab, var(--color-accent) 45%, transparent);
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 18px 44px -22px color-mix(in oklab, var(--color-accent) 40%, transparent);
 }
 
 .card-hover {
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .card-hover:hover {
   transform: translateY(-3px);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 22px 44px -18px rgba(15, 23, 42, 0.2);
   border-color: var(--color-border-strong);
 }
 
 .shimmer-text {
-  background: linear-gradient(
-    90deg,
-    var(--color-muted) 0%,
-    var(--color-foreground) 50%,
-    var(--color-muted) 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: var(--animate-shimmer);
+  color: var(--color-muted);
 }
 
 /* ============================================================
    Print / PDF — clean white report.
-   Redefining the tokens flips every utility to print-friendly.
    ============================================================ */
 @media print {
   @page {
     margin: 14mm;
   }
-  :root {
-    --color-background: #ffffff;
-    --color-surface: #ffffff;
-    --color-card: #ffffff;
-    --color-elevated: #f1f4f9;
-    --color-border: #d9dee8;
-    --color-border-strong: #c4ccda;
-    --color-foreground: #0b1020;
-    --color-muted: #39435c;
-    --color-faint: #6b7691;
-  }
-  html,
-  body {
-    background: #ffffff !important;
-    color: #0b1020 !important;
-  }
   .no-print {
     display: none !important;
   }
   .glass {
-    background: #ffffff !important;
-    border: 1px solid #d9dee8 !important;
     box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  .glow-primary,
-  .glow-accent,
-  .card-hover {
-    box-shadow: none !important;
-  }
-  .bg-grid,
-  .bg-radial-fade {
-    background: none !important;
-  }
-  .text-gradient {
-    background: none !important;
-    -webkit-text-fill-color: #0e7490 !important;
-    color: #0e7490 !important;
   }
   section,
   .glass {
@@ -234,4 +181,68 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================================
+   Dark ("neón") theme — opt-in via .dark on <html>.
+   Restores the original deep-navy + cyan/violet + glow look.
+   ============================================================ */
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+  --color-background: #070a12;
+  --color-surface: #0b1020;
+  --color-card: #0f1626;
+  --color-elevated: #141d31;
+  --color-border: #1e2942;
+  --color-border-strong: #2c3a5a;
+  --color-foreground: #e9eefb;
+  --color-muted: #93a0bd;
+  --color-faint: #5b6885;
+  --color-primary: #22d3ee;
+  --color-primary-foreground: #04121a;
+  --color-accent: #8b5cf6;
+  --color-accent-foreground: #faf5ff;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #fb7185;
+}
+.dark .glass {
+  background: color-mix(in oklab, var(--color-card) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in oklab, var(--color-border-strong) 75%, transparent);
+  box-shadow: none;
+}
+.dark .glow-primary {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-primary) 28%, transparent),
+    0 18px 50px -14px color-mix(in oklab, var(--color-primary) 45%, transparent);
+}
+.dark .glow-accent {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-accent) 28%, transparent),
+    0 18px 50px -14px color-mix(in oklab, var(--color-accent) 45%, transparent);
+}
+.dark .text-gradient {
+  background: linear-gradient(100deg, var(--color-primary), var(--color-accent) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dark .bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px);
+}
+.dark .bg-radial-fade {
+  background:
+    radial-gradient(55% 50% at 50% -5%, color-mix(in oklab, var(--color-primary) 16%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 85% 10%, color-mix(in oklab, var(--color-accent) 14%, transparent), transparent 70%);
+}
+.dark .card-hover:hover {
+  box-shadow: none;
+  border-color: var(--color-border-strong);
 }

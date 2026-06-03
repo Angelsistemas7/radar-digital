@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LogoLockup } from "@/components/ui/logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { AssessmentFlow } from "@/components/assessment/assessment-flow";
 
 export const metadata: Metadata = {
@@ -17,7 +18,10 @@ export default function DiagnosticoPage() {
           <Link href="/" aria-label="Radar Digital — inicio">
             <LogoLockup />
           </Link>
-          <span className="text-sm text-faint">Diagnóstico</span>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <span className="text-sm text-faint">Diagnóstico</span>
+          </div>
         </div>
       </header>
       <main className="flex-1">

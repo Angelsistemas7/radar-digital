@@ -27,8 +27,8 @@ export function Logo({
           y2="44"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#22d3ee" />
-          <stop offset="1" stopColor="#8b5cf6" />
+          <stop stopColor="#0e7490" />
+          <stop offset="1" stopColor="#0891b2" />
         </linearGradient>
         <linearGradient
           id="rdSweep"
@@ -38,8 +38,8 @@ export function Logo({
           y2="10"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#22d3ee" stopOpacity="0.45" />
-          <stop offset="1" stopColor="#22d3ee" stopOpacity="0" />
+          <stop stopColor="#0e7490" stopOpacity="0.45" />
+          <stop offset="1" stopColor="#0e7490" stopOpacity="0" />
         </linearGradient>
       </defs>
       <circle cx="24" cy="24" r="20" stroke="url(#rdLogo)" strokeOpacity="0.3" strokeWidth="1.4" />
@@ -48,8 +48,8 @@ export function Logo({
       <line x1="4" y1="24" x2="44" y2="24" stroke="url(#rdLogo)" strokeOpacity="0.16" strokeWidth="1" />
       <line x1="24" y1="4" x2="24" y2="44" stroke="url(#rdLogo)" strokeOpacity="0.16" strokeWidth="1" />
       <path d="M24 24 L24 4 A20 20 0 0 1 41.3 14 Z" fill="url(#rdSweep)" />
-      <line x1="24" y1="24" x2="24" y2="4" stroke="#22d3ee" strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="33" cy="15" r="2.6" fill="#22d3ee" />
+      <line x1="24" y1="24" x2="24" y2="4" stroke="#0e7490" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="33" cy="15" r="2.6" fill="#0e7490" />
     </svg>
   );
 }

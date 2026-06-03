@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LogoLockup } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ArrowRight } from "lucide-react";
 
 export function SiteHeader() {
@@ -24,6 +25,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/admin"
             className="hidden rounded-lg px-3 py-2 text-sm text-faint transition-colors hover:text-muted sm:block"

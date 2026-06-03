@@ -93,7 +93,7 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
           className="relative mx-auto w-full max-w-md"
         >
-          <div className="animate-spin-slow pointer-events-none absolute -inset-8 rounded-full bg-[conic-gradient(from_0deg,transparent,rgba(34,211,238,0.14),transparent_32%)]" />
+          <div className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-primary/5 blur-2xl" />
           <div className="glass glow-primary relative rounded-3xl p-6">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-semibold text-foreground">

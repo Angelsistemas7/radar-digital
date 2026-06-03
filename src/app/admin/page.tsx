@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { LogoLockup } from "@/components/ui/logo";
 import { LogoutButton } from "@/components/admin/logout-button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { RadarChart } from "@/components/results/radar-chart";
 import {
   LevelDistributionChart,
@@ -97,6 +98,7 @@ export default async function AdminPage() {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/"
               className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:flex"
