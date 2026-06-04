@@ -23,6 +23,7 @@ create table if not exists public.submissions (
   level_id      smallint not null,
   dimensions    jsonb not null,   -- [{ dimensionId, score }]
   answers       jsonb not null,   -- { questionId: 0..10 }
+  wants_contact boolean,          -- lead: ¿quiere que el equipo lo contacte?
   -- audit (no raw PII beyond the form)
   user_agent    text,
   ip_hash       text
@@ -33,8 +34,9 @@ create index if not exists submissions_country_idx    on public.submissions (cou
 create index if not exists submissions_sector_idx     on public.submissions (sector);
 create index if not exists submissions_level_idx      on public.submissions (level_id);
 
--- If you created the table with an older version of this schema, add the column:
+-- If you created the table with an older version of this schema, add the columns:
 alter table public.submissions add column if not exists sector text not null default 'Otro';
+alter table public.submissions add column if not exists wants_contact boolean;
 
 -- ------------------------------------------------------------
 -- Row Level Security: deny all by default.

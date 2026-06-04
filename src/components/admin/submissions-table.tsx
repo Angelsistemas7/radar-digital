@@ -33,6 +33,7 @@ function buildCSV(rows: SubmissionRow[]): string {
     "Sector",
     "Puntaje",
     "Nivel",
+    "Quiere contacto",
     ...DIMS.map((d) => d.name),
   ];
   const lines = rows.map((r) => {
@@ -52,6 +53,7 @@ function buildCSV(rows: SubmissionRow[]): string {
       r.sector,
       r.overall_score,
       levelOf(r.level_id)?.name ?? r.level_id,
+      r.wants_contact === true ? "Sí" : r.wants_contact === false ? "No" : "",
       ...dimScores,
     ];
   });
@@ -74,18 +76,20 @@ function downloadCSV(rows: SubmissionRow[]) {
 export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<number | "all">("all");
+  const [onlyLeads, setOnlyLeads] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return rows.filter((r) => {
       if (level !== "all" && r.level_id !== level) return false;
+      if (onlyLeads && r.wants_contact !== true) return false;
       if (!q) return true;
       return [r.company, r.full_name, r.email, r.city, r.country, r.role, r.sector]
         .join(" ")
         .toLowerCase()
         .includes(q);
     });
-  }, [rows, query, level]);
+  }, [rows, query, level, onlyLeads]);
 
   return (
     <div className="glass rounded-3xl p-5 sm:p-6">
@@ -120,6 +124,19 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
           </select>
           <button
             type="button"
+            onClick={() => setOnlyLeads((v) => !v)}
+            aria-pressed={onlyLeads}
+            className={
+              "rounded-lg border px-3 py-2 text-sm font-medium transition " +
+              (onlyLeads
+                ? "border-success/50 bg-success/10 text-success"
+                : "border-border text-muted hover:text-foreground")
+            }
+          >
+            Solo interesados
+          </button>
+          <button
+            type="button"
             onClick={() => downloadCSV(filtered)}
             disabled={filtered.length === 0}
             className={buttonClasses("secondary", "sm")}
@@ -147,6 +164,7 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
                 <th className="px-3 py-2.5 font-medium">Correo</th>
                 <th className="px-3 py-2.5 text-right font-medium">Puntaje</th>
                 <th className="px-3 py-2.5 font-medium">Nivel</th>
+                <th className="px-3 py-2.5 font-medium">Contacto</th>
               </tr>
             </thead>
             <tbody>
@@ -184,6 +202,15 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
                       >
                         {lvl?.name ?? "—"}
                       </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      {r.wants_contact === true ? (
+                        <span className="rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success">
+                          Sí
+                        </span>
+                      ) : (
+                        <span className="text-xs text-faint">—</span>
+                      )}
                     </td>
                   </tr>
                 );

@@ -153,6 +153,7 @@ export function AssessmentFlow() {
               result={result}
               company={respondent?.company}
               sector={respondent?.sector}
+              email={respondent?.email}
               onRestart={handleRestart}
             />
           </motion.div>

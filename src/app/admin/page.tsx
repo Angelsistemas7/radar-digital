@@ -11,6 +11,7 @@ import {
   TriangleAlert,
   Database,
   Layers,
+  Handshake,
 } from "lucide-react";
 import { LogoLockup } from "@/components/ui/logo";
 import { LogoutButton } from "@/components/admin/logout-button";
@@ -145,7 +146,7 @@ export default async function AdminPage() {
         )}
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           <Kpi icon={Users} label="Empresas evaluadas" value={String(summary.total)} accent="#22d3ee" />
           <Kpi
             icon={Gauge}
@@ -158,6 +159,12 @@ export default async function AdminPage() {
             label="Nivel más común"
             value={summary.topLevel?.name ?? "—"}
             accent={summary.topLevel?.color ?? "#34d399"}
+          />
+          <Kpi
+            icon={Handshake}
+            label="Interesados en contacto"
+            value={String(summary.leads)}
+            accent="#10b981"
           />
           <Kpi
             icon={Globe2}

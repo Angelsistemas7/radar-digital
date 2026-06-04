@@ -22,6 +22,7 @@ export interface SubmissionRow {
   level_id: number;
   dimensions: { dimensionId: string; score: number }[];
   answers: Answers;
+  wants_contact?: boolean | null;
   user_agent?: string | null;
   ip_hash?: string | null;
 }
@@ -164,6 +165,7 @@ function demoRows(): SubmissionRow[] {
       level_id: levelForScore(overall).id,
       dimensions,
       answers: {},
+      wants_contact: rnd() > 0.6,
     });
   }
   return rows.sort((a, b) => b.created_at.localeCompare(a.created_at));
@@ -185,6 +187,7 @@ export async function listSubmissions(): Promise<SubmissionRow[]> {
 
 export interface AdminSummary {
   total: number;
+  leads: number;
   avgOverall: number;
   topLevel: { name: string; color: string } | null;
   levelDistribution: { levelId: number; name: string; color: string; count: number }[];
@@ -196,6 +199,7 @@ export interface AdminSummary {
 
 export function summarize(rows: SubmissionRow[]): AdminSummary {
   const total = rows.length;
+  const leads = rows.filter((r) => r.wants_contact === true).length;
   const avgOverall = total
     ? round1(rows.reduce((a, r) => a + Number(r.overall_score), 0) / total)
     : 0;
@@ -247,6 +251,7 @@ export function summarize(rows: SubmissionRow[]): AdminSummary {
 
   return {
     total,
+    leads,
     avgOverall,
     topLevel,
     levelDistribution,

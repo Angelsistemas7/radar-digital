@@ -10,6 +10,10 @@ import {
   CalendarCheck,
   Sparkles,
   ArrowRight,
+  CheckCircle2,
+  Handshake,
+  Rocket,
+  Loader2,
 } from "lucide-react";
 import { RadarChart, type RadarDatum } from "./radar-chart";
 import { AiAdvisor } from "./ai-advisor";
@@ -152,11 +156,13 @@ export function ResultView({
   result,
   company,
   sector,
+  email,
   onRestart,
 }: {
   result: AssessmentResult;
   company?: string;
   sector?: string;
+  email?: string;
   onRestart?: () => void;
 }) {
   const diagnosis = generateDiagnosis(result, { company: company ?? "" });
@@ -169,6 +175,29 @@ export function ResultView({
   const [compare, setCompare] = useState<RadarDatum[] | null>(null);
   const [compareOverall, setCompareOverall] = useState<number | null>(null);
   const [showCompare, setShowCompare] = useState(true);
+
+  // finish + lead capture
+  const [wantsContact, setWantsContact] = useState<boolean | null>(null);
+  const [sending, setSending] = useState(false);
+  const [finished, setFinished] = useState(false);
+
+  const handleFinish = async () => {
+    if (wantsContact === null || sending) return;
+    setSending(true);
+    try {
+      if (email) {
+        await fetch("/api/contacto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, wantsContact }),
+        });
+      }
+    } catch {
+      /* never block the confirmation on a network hiccup */
+    }
+    setSending(false);
+    setFinished(true);
+  };
 
   useEffect(() => {
     let active = true;
@@ -552,34 +581,151 @@ export function ResultView({
         />
       </Reveal>
 
-      {/* next steps */}
+      {/* finish + lead capture */}
       <Reveal className="no-print">
-        <div className="glass flex flex-col gap-4 rounded-3xl p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-semibold">¿Quieres avanzar con acompañamiento?</h2>
-            <p className="text-sm text-muted">
-              Descarga tu resultado o repite el diagnóstico cuando quieras.
-            </p>
+        {!finished ? (
+          <div className="glass glow-accent relative overflow-hidden rounded-3xl p-6 sm:p-8">
+            <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <Handshake className="size-5 text-accent" />
+                <h2 className="text-xl font-bold tracking-tight">Da el siguiente paso</h2>
+              </div>
+              <p className="mt-2 max-w-2xl text-sm text-muted">
+                ¿Quieres que nuestro equipo te acompañe a convertir este diagnóstico
+                en resultados reales? Si nos autorizas, te contactamos para ayudarte —
+                sin costo y sin compromiso.
+              </p>
+
+              <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+                {[
+                  {
+                    t: "Asesoría personalizada",
+                    d: "Interpretamos tus resultados contigo, paso a paso.",
+                  },
+                  {
+                    t: "Plan a tu medida",
+                    d: "Una hoja de ruta adaptada a tu empresa y tu sector.",
+                  },
+                  {
+                    t: "Acceso prioritario",
+                    d: "Talleres, recursos y herramientas para avanzar más rápido.",
+                  },
+                ].map((b) => (
+                  <li
+                    key={b.t}
+                    className="rounded-2xl border border-border/70 bg-surface/40 p-4"
+                  >
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="size-4 shrink-0 text-success" />
+                      <span className="text-sm font-semibold">{b.t}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted">{b.d}</p>
+                  </li>
+                ))}
+              </ul>
+
+              <fieldset className="mt-6">
+                <legend className="text-sm font-medium text-foreground/90">
+                  ¿Te gustaría que nuestro equipo te contacte?
+                </legend>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setWantsContact(true)}
+                    aria-pressed={wantsContact === true}
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition",
+                      wantsContact === true
+                        ? "border-success/50 bg-success/10 text-success"
+                        : "border-border text-muted hover:text-foreground",
+                    )}
+                  >
+                    <CheckCircle2 className="size-4" /> Sí, quiero que me contacten
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWantsContact(false)}
+                    aria-pressed={wantsContact === false}
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition",
+                      wantsContact === false
+                        ? "border-border-strong bg-elevated text-foreground"
+                        : "border-border text-muted hover:text-foreground",
+                    )}
+                  >
+                    No, gracias
+                  </button>
+                </div>
+              </fieldset>
+
+              <div className="mt-7 flex flex-col gap-3 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => downloadReport(result, company, sector)}
+                  className={buttonClasses("secondary", "md")}
+                >
+                  <Download className="size-4" /> Descargar PDF
+                </button>
+                <div className="flex flex-col items-stretch gap-1 sm:items-end">
+                  <button
+                    type="button"
+                    onClick={handleFinish}
+                    disabled={wantsContact === null || sending}
+                    className={buttonClasses("primary", "md")}
+                  >
+                    {sending ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Rocket className="size-4" />
+                    )}
+                    {sending ? "Enviando…" : "Terminar"}
+                  </button>
+                  {wantsContact === null && (
+                    <span className="text-xs text-faint">
+                      Elige una opción para terminar.
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex shrink-0 gap-3">
-            <button
-              type="button"
-              onClick={() => downloadReport(result, company, sector)}
-              className={buttonClasses("secondary", "md")}
-            >
-              <Download className="size-4" /> Descargar PDF
-            </button>
-            {onRestart && (
-              <button
-                type="button"
-                onClick={onRestart}
-                className={buttonClasses("ghost", "md")}
-              >
-                <RotateCcw className="size-4" /> Repetir
-              </button>
-            )}
+        ) : (
+          <div className="glass glow-primary relative overflow-hidden rounded-3xl p-8 text-center">
+            <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
+            <div className="relative mx-auto max-w-xl">
+              <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-success/15 text-success">
+                <CheckCircle2 className="size-7" />
+              </span>
+              <h2 className="mt-4 text-2xl font-bold tracking-tight">
+                ¡Diagnóstico completado!
+              </h2>
+              <p className="mt-2 text-muted">
+                {wantsContact
+                  ? "Gracias. Nuestro equipo te contactará pronto para ayudarte a dar el siguiente paso."
+                  : "Gracias por completar tu diagnóstico de madurez digital. Puedes descargar tu informe cuando quieras."}
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => downloadReport(result, company, sector)}
+                  className={buttonClasses("secondary", "md")}
+                >
+                  <Download className="size-4" /> Descargar PDF
+                </button>
+                {onRestart && (
+                  <button
+                    type="button"
+                    onClick={onRestart}
+                    className={buttonClasses("ghost", "md")}
+                  >
+                    <RotateCcw className="size-4" /> Hacer otro diagnóstico
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </Reveal>
     </div>
   );
