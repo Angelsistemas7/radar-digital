@@ -22,6 +22,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
 import { downloadReport } from "@/lib/pdf";
+import { clearState } from "@/lib/storage";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
 import { cn, formatScore } from "@/lib/utils";
 import type { AssessmentResult, DimensionScore, RecommendationBand } from "@/lib/types";
@@ -179,7 +180,6 @@ export function ResultView({
   // finish + lead capture
   const [wantsContact, setWantsContact] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
-  const [finished, setFinished] = useState(false);
 
   const handleFinish = async () => {
     if (wantsContact === null || sending) return;
@@ -193,10 +193,12 @@ export function ResultView({
         });
       }
     } catch {
-      /* never block the confirmation on a network hiccup */
+      /* never block on a hiccup — the diagnosis is already saved */
     }
-    setSending(false);
-    setFinished(true);
+    // The submission was already saved when the questionnaire finished.
+    // Clear the in-progress state and return to the home screen.
+    clearState();
+    window.location.href = "/";
   };
 
   useEffect(() => {
@@ -583,7 +585,6 @@ export function ResultView({
 
       {/* finish + lead capture */}
       <Reveal className="no-print">
-        {!finished ? (
           <div className="glass glow-accent relative overflow-hidden rounded-3xl p-6 sm:p-8">
             <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
             <div className="relative">
@@ -667,65 +668,40 @@ export function ResultView({
                 >
                   <Download className="size-4" /> Descargar PDF
                 </button>
-                <div className="flex flex-col items-stretch gap-1 sm:items-end">
-                  <button
-                    type="button"
-                    onClick={handleFinish}
-                    disabled={wantsContact === null || sending}
-                    className={buttonClasses("primary", "md")}
-                  >
-                    {sending ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <Rocket className="size-4" />
-                    )}
-                    {sending ? "Enviando…" : "Terminar"}
-                  </button>
-                  {wantsContact === null && (
-                    <span className="text-xs text-faint">
-                      Elige una opción para terminar.
-                    </span>
+                <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
+                  {onRestart && (
+                    <button
+                      type="button"
+                      onClick={onRestart}
+                      className={buttonClasses("ghost", "md")}
+                    >
+                      <RotateCcw className="size-4" /> Repetir test
+                    </button>
                   )}
+                  <div className="flex flex-col items-stretch gap-1 sm:items-end">
+                    <button
+                      type="button"
+                      onClick={handleFinish}
+                      disabled={wantsContact === null || sending}
+                      className={buttonClasses("primary", "md")}
+                    >
+                      {sending ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Rocket className="size-4" />
+                      )}
+                      {sending ? "Guardando…" : "Terminar"}
+                    </button>
+                    {wantsContact === null && (
+                      <span className="text-xs text-faint">
+                        Elige una opción para terminar.
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="glass glow-primary relative overflow-hidden rounded-3xl p-8 text-center">
-            <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
-            <div className="relative mx-auto max-w-xl">
-              <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-success/15 text-success">
-                <CheckCircle2 className="size-7" />
-              </span>
-              <h2 className="mt-4 text-2xl font-bold tracking-tight">
-                ¡Diagnóstico completado!
-              </h2>
-              <p className="mt-2 text-muted">
-                {wantsContact
-                  ? "Gracias. Nuestro equipo te contactará pronto para ayudarte a dar el siguiente paso."
-                  : "Gracias por completar tu diagnóstico de madurez digital. Puedes descargar tu informe cuando quieras."}
-              </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => downloadReport(result, company, sector)}
-                  className={buttonClasses("secondary", "md")}
-                >
-                  <Download className="size-4" /> Descargar PDF
-                </button>
-                {onRestart && (
-                  <button
-                    type="button"
-                    onClick={onRestart}
-                    className={buttonClasses("ghost", "md")}
-                  >
-                    <RotateCcw className="size-4" /> Hacer otro diagnóstico
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </Reveal>
     </div>
   );
