@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { LogoLockup } from "@/components/ui/logo";
 import { LogoutButton } from "@/components/admin/logout-button";
+import { AdminAutoLogout } from "@/components/admin/auto-logout";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { RadarChart } from "@/components/results/radar-chart";
 import {
@@ -88,6 +89,7 @@ export default async function AdminPage() {
 
   return (
     <>
+      <AdminAutoLogout />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
           <div className="flex items-center gap-3">

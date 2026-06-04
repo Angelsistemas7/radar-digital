@@ -5,7 +5,10 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  * Pure crypto only (safe to import from proxy.ts and route handlers).
  */
 export const ADMIN_COOKIE = "rd_admin";
-const TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
+/** Idle window. The proxy refreshes the cookie on each admin request, so an
+ *  active session stays alive but ~30 min of inactivity (or closing the tab
+ *  and coming back later) ends it. */
+export const TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 function secret(): string {
   return process.env.ADMIN_SESSION_SECRET || "radar-digital-dev-secret-change-me";
@@ -49,10 +52,13 @@ export function checkAdminPassword(password: string): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+/**
+ * Session cookie (no `maxAge`/`expires`) so the browser drops it when it
+ * closes. The signed token still carries its own expiry, enforced server-side.
+ */
 export const adminCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax" as const,
   path: "/",
-  maxAge: Math.floor(TTL_MS / 1000),
 };
