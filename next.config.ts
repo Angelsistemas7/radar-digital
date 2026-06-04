@@ -15,6 +15,10 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   `connect-src 'self' https://*.supabase.co${isProd ? "" : " ws: wss: http:"}`,
+  "frame-src 'none'",
+  "manifest-src 'self'",
+  "worker-src 'self' blob:",
+  ...(isProd ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
 const securityHeaders = [

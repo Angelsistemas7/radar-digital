@@ -76,12 +76,22 @@ function downloadCSV(rows: SubmissionRow[]) {
 export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<number | "all">("all");
+  const [sector, setSector] = useState<string>("all");
   const [onlyLeads, setOnlyLeads] = useState(false);
+
+  const sectors = useMemo(
+    () =>
+      Array.from(new Set(rows.map((r) => r.sector).filter(Boolean))).sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    [rows],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return rows.filter((r) => {
       if (level !== "all" && r.level_id !== level) return false;
+      if (sector !== "all" && r.sector !== sector) return false;
       if (onlyLeads && r.wants_contact !== true) return false;
       if (!q) return true;
       return [r.company, r.full_name, r.email, r.city, r.country, r.role, r.sector]
@@ -89,7 +99,7 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
         .toLowerCase()
         .includes(q);
     });
-  }, [rows, query, level, onlyLeads]);
+  }, [rows, query, level, sector, onlyLeads]);
 
   return (
     <div className="glass rounded-3xl p-5 sm:p-6">
@@ -119,6 +129,18 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
             {LEVELS.map((l) => (
               <option key={l.id} value={l.id} className="bg-surface">
                 {l.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={sector}
+            onChange={(e) => setSector(e.target.value)}
+            className="rounded-lg border border-border bg-surface/70 px-3 py-2 text-sm outline-none focus:border-primary/60"
+          >
+            <option value="all">Todos los sectores</option>
+            {sectors.map((s) => (
+              <option key={s} value={s} className="bg-surface">
+                {s}
               </option>
             ))}
           </select>

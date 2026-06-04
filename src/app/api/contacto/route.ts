@@ -42,24 +42,46 @@ export async function POST(req: NextRequest) {
   // Best-effort: attach the preference to the most recent submission for
   // this email. Never block the user's confirmation on a DB hiccup.
   const supabase = getSupabaseAdmin();
+  let lead: Record<string, unknown> = {};
   if (supabase) {
     try {
       const { data } = await supabase
         .from("submissions")
-        .select("id")
+        .select("id, company, full_name, phone, sector, overall_score")
         .eq("email", email.toLowerCase())
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (data?.id) {
+        lead = data;
         await supabase
           .from("submissions")
           .update({ wants_contact: wantsContact })
-          .eq("id", data.id);
+          .eq("id", data.id as string);
       }
     } catch {
       /* column may not exist yet, or transient error — ignore */
     }
+  }
+
+  // Notify the team about a new interested lead. Point LEAD_WEBHOOK_URL (or the
+  // shared N8N_WEBHOOK_URL) at an n8n/Make/Zapier flow to forward it to email,
+  // Google Sheets or a CRM — no extra code needed. Fire-and-forget.
+  const hook = process.env.LEAD_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
+  if (wantsContact && hook) {
+    void fetch(hook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "lead",
+        email: email.toLowerCase(),
+        wantsContact,
+        ...lead,
+        created_at: new Date().toISOString(),
+      }),
+    }).catch(() => {
+      /* ignore webhook failures */
+    });
   }
 
   return NextResponse.json({ ok: true });
