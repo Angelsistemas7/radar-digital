@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+import { notifyLeadByEmail } from "@/lib/notify";
 import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -81,6 +82,18 @@ export async function POST(req: NextRequest) {
       }),
     }).catch(() => {
       /* ignore webhook failures */
+    });
+  }
+
+  // Email the team directly (Resend). No-op unless RESEND_API_KEY is set.
+  if (wantsContact) {
+    void notifyLeadByEmail({
+      email: email.toLowerCase(),
+      company: lead.company as string | undefined,
+      full_name: lead.full_name as string | undefined,
+      phone: lead.phone as string | undefined,
+      sector: lead.sector as string | undefined,
+      overall_score: lead.overall_score as number | undefined,
     });
   }
 

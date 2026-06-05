@@ -20,7 +20,7 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://radar-digital.app"),
+  metadataBase: new URL("https://radar-digital-three.vercel.app"),
   title: {
     default: "Radar Digital — Diagnóstico de Madurez Digital",
     template: "%s · Radar Digital",
@@ -39,8 +39,16 @@ export const metadata: Metadata = {
     title: "Radar Digital — Diagnóstico de Madurez Digital",
     description:
       "Descubre las fortalezas y debilidades digitales de tu empresa con un radar de 8 dimensiones.",
+    siteName: "Radar Digital",
+    url: "https://radar-digital-three.vercel.app",
     type: "website",
     locale: "es_CO",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Radar Digital — Diagnóstico de Madurez Digital",
+    description:
+      "Mide la madurez digital de tu empresa en 8 dimensiones y recibe un plan de acción.",
   },
   robots: { index: true, follow: true },
 };
