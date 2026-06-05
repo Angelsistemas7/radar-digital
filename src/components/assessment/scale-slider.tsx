@@ -12,6 +12,11 @@ function colorFor(v: number): string {
   return "#0e7490";
 }
 
+/** "3" for whole numbers, "3,5" for halves (Colombian comma). */
+function fmtValue(v: number): string {
+  return (Number.isInteger(v) ? String(v) : v.toFixed(1)).replace(".", ",");
+}
+
 /** 0-10 slider with a dynamic color that reflects the chosen value. */
 export function ScaleSlider({
   value,
@@ -61,10 +66,10 @@ export function ScaleSlider({
             type="range"
             min={0}
             max={max}
-            step={0.1}
+            step={0.5}
             value={current}
             onChange={(e) =>
-              onChange(Math.round(Number(e.target.value) * 10) / 10)
+              onChange(Math.round(Number(e.target.value) * 2) / 2)
             }
             aria-label="Calificación de 0 a 10"
             className="absolute inset-0 size-full cursor-pointer opacity-0"
@@ -80,7 +85,7 @@ export function ScaleSlider({
             backgroundColor: answered ? `${color}14` : "transparent",
           }}
         >
-          {answered ? value.toFixed(1) : "–"}
+          {answered ? fmtValue(value) : "–"}
         </div>
       </div>
 

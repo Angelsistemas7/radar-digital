@@ -14,7 +14,7 @@ export const QUESTIONNAIRE: Questionnaire = {
   scale: {
     min: 0,
     max: 10,
-    step: 0.1,
+    step: 0.5,
     anchors: [
       { value: 0, label: "No existe" },
       { value: 5, label: "En desarrollo" },

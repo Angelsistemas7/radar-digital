@@ -2,7 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { notifyLeadByEmail } from "@/lib/notify";
+import { computeResult } from "@/lib/scoring";
+import { generateDiagnosis } from "@/lib/diagnosis";
 import { rateLimit } from "@/lib/rate-limit";
+import type { Answers } from "@/lib/types";
 
 export const runtime = "nodejs";
 
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
     try {
       const { data } = await supabase
         .from("submissions")
-        .select("id, company, full_name, phone, sector, overall_score")
+        .select("id, company, full_name, phone, sector, overall_score, answers")
         .eq("email", email.toLowerCase())
         .order("created_at", { ascending: false })
         .limit(1)
@@ -86,14 +89,55 @@ export async function POST(req: NextRequest) {
   }
 
   // Email the team directly (Resend). No-op unless RESEND_API_KEY is set.
+  // We recompute the result from the stored answers to include the radar
+  // chart and the suggested first-phase action plan in the email.
   if (wantsContact) {
+    let dimensions: { name: string; score: number; color: string }[] | undefined;
+    let overall = lead.overall_score as number | undefined;
+    let levelName: string | undefined;
+    let plan: { label: string; items: import("@/lib/notify").LeadPlanItem[] } | null =
+      null;
+    try {
+      const answers = (lead.answers ?? {}) as Answers;
+      if (answers && Object.keys(answers).length) {
+        const result = computeResult(answers);
+        const diag = generateDiagnosis(result, {
+          company: (lead.company as string) ?? "",
+        });
+        dimensions = result.dimensions.map((d) => ({
+          name: d.name,
+          score: d.score,
+          color: d.color,
+        }));
+        overall = result.overall;
+        levelName = result.level.name;
+        const phase1 = diag.plan[0];
+        if (phase1) {
+          plan = {
+            label: phase1.label,
+            items: phase1.items.map((it) => ({
+              dimensionName: it.dimensionName,
+              score: it.score,
+              target: it.target,
+              actions: it.actions,
+            })),
+          };
+        }
+      }
+    } catch {
+      /* fall back to the basic email if recomputation fails */
+    }
+
     void notifyLeadByEmail({
       email: email.toLowerCase(),
       company: lead.company as string | undefined,
       full_name: lead.full_name as string | undefined,
       phone: lead.phone as string | undefined,
       sector: lead.sector as string | undefined,
-      overall_score: lead.overall_score as number | undefined,
+      overall,
+      levelName,
+      dimensions,
+      plan,
     });
   }
 

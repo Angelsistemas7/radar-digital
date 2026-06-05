@@ -1,19 +1,36 @@
 /**
  * Lead notifications. When someone finishes the diagnosis and asks to be
- * contacted, the team gets an email with their details.
+ * contacted, the team gets a rich email with their details, a radar chart of
+ * their digital maturity and the suggested first-phase action plan.
  *
  * Uses Resend (https://resend.com) over its REST API — no SDK, no SMTP server.
  * Fully optional: if RESEND_API_KEY / LEAD_NOTIFY_EMAIL aren't set, this is a
  * no-op, so the app keeps working without it.
  */
 
-export interface LeadInfo {
+export interface LeadDimension {
+  name: string;
+  score: number;
+  color: string;
+}
+
+export interface LeadPlanItem {
+  dimensionName: string;
+  score: number;
+  target: number;
+  actions: string[];
+}
+
+export interface LeadEmailData {
   email: string;
   company?: string | null;
   full_name?: string | null;
   phone?: string | null;
   sector?: string | null;
-  overall_score?: number | null;
+  overall?: number | null;
+  levelName?: string | null;
+  dimensions?: LeadDimension[];
+  plan?: { label: string; items: LeadPlanItem[] } | null;
 }
 
 function esc(s: unknown): string {
@@ -23,7 +40,85 @@ function esc(s: unknown): string {
     .replace(/>/g, "&gt;");
 }
 
-export async function notifyLeadByEmail(lead: LeadInfo): Promise<void> {
+function fmt(v: number | null | undefined): string {
+  if (v == null) return "—";
+  return Number.isInteger(v) ? String(v) : Number(v).toFixed(1).replace(".", ",");
+}
+
+/** A radar chart rendered as a PNG by QuickChart (works in email clients). */
+function radarUrl(dims: LeadDimension[]): string {
+  const cfg = {
+    type: "radar",
+    data: {
+      labels: dims.map((d) => d.name),
+      datasets: [
+        {
+          data: dims.map((d) => d.score),
+          backgroundColor: "rgba(14,116,144,0.22)",
+          borderColor: "#0e7490",
+          pointBackgroundColor: "#0e7490",
+          pointRadius: 3,
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      legend: { display: false },
+      scale: {
+        ticks: { beginAtZero: true, min: 0, max: 10, stepSize: 2, display: false },
+        pointLabels: { fontSize: 12, fontColor: "#334155" },
+        gridLines: { color: "#e2e8f0" },
+        angleLines: { color: "#e2e8f0" },
+      },
+    },
+  };
+  return (
+    "https://quickchart.io/chart?w=520&h=420&bkg=white&c=" +
+    encodeURIComponent(JSON.stringify(cfg))
+  );
+}
+
+function barsHtml(dims: LeadDimension[]): string {
+  return dims
+    .map(
+      (d) => `
+      <tr>
+        <td style="padding:5px 8px;font-size:13px;color:#334155;white-space:nowrap">${esc(d.name)}</td>
+        <td style="padding:5px 8px;width:100%">
+          <div style="background:#eef2f7;border-radius:6px;height:9px">
+            <div style="background:${d.color};height:9px;border-radius:6px;width:${Math.round((d.score / 10) * 100)}%"></div>
+          </div>
+        </td>
+        <td style="padding:5px 8px;font-size:13px;font-weight:700;color:${d.color};text-align:right">${fmt(d.score)}</td>
+      </tr>`,
+    )
+    .join("");
+}
+
+function planHtml(plan: LeadEmailData["plan"]): string {
+  if (!plan || !plan.items?.length) return "";
+  const items = plan.items
+    .map(
+      (it) => `
+      <div style="border-left:3px solid #4f46e5;padding:8px 14px;margin:10px 0;background:#f8fafc;border-radius:0 8px 8px 0">
+        <div style="font-size:14px;font-weight:700;color:#0f172a">
+          ${esc(it.dimensionName)}
+          <span style="color:#94a3b8;font-weight:400;font-size:13px">(${fmt(it.score)} → ${fmt(it.target)})</span>
+        </div>
+        <ul style="margin:6px 0 0;padding-left:18px;color:#475569;font-size:13px;line-height:1.5">
+          ${it.actions.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join("")}
+        </ul>
+      </div>`,
+    )
+    .join("");
+  return `
+    <div style="padding:18px 22px 6px">
+      <div style="font-size:15px;font-weight:700;color:#0f172a">Plan de acción sugerido · ${esc(plan.label)}</div>
+    </div>
+    <div style="padding:0 22px 10px">${items}</div>`;
+}
+
+export async function notifyLeadByEmail(lead: LeadEmailData): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.LEAD_NOTIFY_EMAIL;
   if (!apiKey || !to) return;
@@ -37,26 +132,42 @@ export async function notifyLeadByEmail(lead: LeadInfo): Promise<void> {
        <td style="padding:6px 14px;color:#0f172a;font-size:14px;font-weight:600">${esc(value)}</td>
      </tr>`;
 
-  const score =
-    lead.overall_score != null
-      ? `${Number(lead.overall_score).toFixed(1).replace(".", ",")} / 10`
-      : "—";
+  const score = lead.overall != null ? `${fmt(lead.overall)} / 10` : "—";
+  const dims = lead.dimensions ?? [];
+  const radar = dims.length
+    ? `<div style="text-align:center;padding:8px 0 4px">
+         <img src="${radarUrl(dims)}" width="430" alt="Radar de madurez digital" style="max-width:100%;border-radius:12px" />
+       </div>`
+    : "";
+  const bars = dims.length
+    ? `<div style="padding:6px 22px 4px">
+         <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">Puntaje por dimensión</div>
+         <table style="width:100%;border-collapse:collapse">${barsHtml(dims)}</table>
+       </div>`
+    : "";
 
   const html = `
   <div style="font-family:Segoe UI,Arial,sans-serif;background:#f6f7f9;padding:24px">
-    <div style="max-width:520px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
+    <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
       <div style="background:#0e7490;color:#fff;padding:18px 22px">
         <div style="font-size:13px;opacity:.85;letter-spacing:.04em;text-transform:uppercase">Radar Digital</div>
         <div style="font-size:19px;font-weight:700;margin-top:2px">Nuevo interesado en contacto</div>
       </div>
+
       <table style="width:100%;border-collapse:collapse;margin:8px 0">
         ${row("Empresa", lead.company)}
         ${row("Persona", lead.full_name)}
         ${row("Correo", lead.email)}
         ${row("Teléfono", lead.phone)}
         ${row("Sector", lead.sector)}
+        ${row("Nivel", lead.levelName)}
         ${row("Madurez", score)}
       </table>
+
+      ${radar}
+      ${bars}
+      ${planHtml(lead.plan)}
+
       <div style="padding:14px 22px;border-top:1px solid #eef2f7;color:#94a3b8;font-size:12px">
         Esta persona completó el diagnóstico y pidió que el equipo la contacte.
       </div>
