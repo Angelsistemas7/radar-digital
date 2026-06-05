@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, Download, Inbox } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Search, Download, Inbox, X, Mail, Phone } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
 import { formatScore } from "@/lib/utils";
@@ -78,6 +78,15 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
   const [level, setLevel] = useState<number | "all">("all");
   const [sector, setSector] = useState<string>("all");
   const [onlyLeads, setOnlyLeads] = useState(false);
+  const [detail, setDetail] = useState<SubmissionRow | null>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDetail(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const sectors = useMemo(
     () =>
@@ -195,7 +204,9 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
                 return (
                   <tr
                     key={r.id}
-                    className="border-t border-border/60 transition-colors hover:bg-elevated/40"
+                    onClick={() => setDetail(r)}
+                    title="Ver detalle"
+                    className="cursor-pointer border-t border-border/60 transition-colors hover:bg-elevated/40"
                   >
                     <td className="whitespace-nowrap px-3 py-2.5 text-faint">
                       {r.created_at?.slice(0, 10)}
@@ -241,6 +252,142 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
           </table>
         </div>
       )}
+
+      {detail && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setDetail(null)}
+        >
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+            className="glass relative z-10 max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-3xl p-6"
+          >
+            {(() => {
+              const lvl = levelOf(detail.level_id);
+              return (
+                <>
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-xl font-bold tracking-tight">
+                        {detail.company}
+                      </h3>
+                      <p className="text-sm text-muted">
+                        {detail.full_name} · {detail.role}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDetail(null)}
+                      className="rounded-lg p-1.5 text-muted transition hover:bg-elevated hover:text-foreground"
+                      aria-label="Cerrar"
+                    >
+                      <X className="size-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span
+                      className="text-3xl font-bold tabular-nums"
+                      style={{ color: lvl?.color }}
+                    >
+                      {formatScore(Number(detail.overall_score))}
+                      <span className="text-base font-normal text-faint"> /10</span>
+                    </span>
+                    <span
+                      className="rounded-full px-3 py-1 text-xs font-semibold"
+                      style={{
+                        backgroundColor: `${lvl?.color ?? "#5b6885"}1f`,
+                        color: lvl?.color ?? "#93a0bd",
+                      }}
+                    >
+                      {lvl?.name ?? "—"}
+                    </span>
+                    {detail.wants_contact === true && (
+                      <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
+                        Quiere contacto
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                    <Field
+                      label="Correo"
+                      value={detail.email}
+                      icon={<Mail className="size-3.5" />}
+                    />
+                    <Field
+                      label="Teléfono"
+                      value={detail.phone}
+                      icon={<Phone className="size-3.5" />}
+                    />
+                    <Field label="Ciudad" value={detail.city} />
+                    <Field label="País" value={detail.country} />
+                    <Field label="Sector" value={detail.sector} />
+                    <Field label="Género" value={detail.gender} />
+                    <Field label="Fecha" value={detail.created_at?.slice(0, 10)} />
+                  </div>
+
+                  <h4 className="mt-5 mb-3 text-xs font-semibold uppercase tracking-wide text-faint">
+                    Puntaje por dimensión
+                  </h4>
+                  <div className="space-y-2.5">
+                    {DIMS.map((d) => {
+                      const s =
+                        detail.dimensions?.find((x) => x.dimensionId === d.id)
+                          ?.score ?? 0;
+                      return (
+                        <div key={d.id}>
+                          <div className="mb-1 flex items-center justify-between text-xs">
+                            <span className="text-muted">{d.name}</span>
+                            <span
+                              className="font-semibold tabular-nums"
+                              style={{ color: d.color }}
+                            >
+                              {formatScore(Number(s))}
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-elevated">
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${(Number(s) / 10) * 100}%`,
+                                backgroundColor: d.color,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value?: string | null;
+  icon?: ReactNode;
+}) {
+  return (
+    <div className="min-w-0">
+      <p className="flex items-center gap-1 text-xs text-faint">
+        {icon}
+        {label}
+      </p>
+      <p className="truncate font-medium text-foreground/90">{value || "—"}</p>
     </div>
   );
 }
