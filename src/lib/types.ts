@@ -11,6 +11,20 @@ export interface ScaleAnchor {
   label: string;
 }
 
+/** A traffic-light answer option (red/amber/green) shown per question. */
+export interface ResponseOption {
+  /** Stable id ("no" | "parcial" | "si"). */
+  id: string;
+  /** Light color (maps to the lamp + meaning). */
+  tone: "red" | "amber" | "green";
+  /** Short label under the lamp ("No", "Más o menos", "Sí"). */
+  label: string;
+  /** Helper line under the label. */
+  hint: string;
+  /** Score this option contributes on the 0-10 scale (0 | 5 | 10). */
+  value: number;
+}
+
 export interface Question {
   id: string;
   text: string;
@@ -51,6 +65,8 @@ export interface Questionnaire {
   version: string;
   title: string;
   scale: { min: number; max: number; step: number; anchors: ScaleAnchor[] };
+  /** The three traffic-light options every question is answered with. */
+  responseOptions: ResponseOption[];
   dimensions: Dimension[];
   maturityLevels: MaturityLevel[];
 }

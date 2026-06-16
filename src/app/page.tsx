@@ -14,7 +14,7 @@ const STEPS = [
   {
     icon: ClipboardList,
     title: "Responde el cuestionario",
-    text: `${totalQuestions()} preguntas en ${DIMENSIONS.length} dimensiones, en una escala de 0 a 10. Te toma alrededor de 5 minutos.`,
+    text: `${totalQuestions()} preguntas en ${DIMENSIONS.length} dimensiones. Respondes con un semáforo: verde (sí), amarillo (más o menos) o rojo (no). Te toma unos 5 minutos.`,
   },
   {
     icon: Radar,

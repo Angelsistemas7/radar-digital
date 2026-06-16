@@ -2,25 +2,40 @@ import type { Questionnaire } from "./types";
 
 /* ============================================================
    Radar Digital — Questionnaire configuration
-   8 dimensions of digital maturity · 4 questions each · scale 0-10.
-   This is the single source of truth. Edit here to change the
-   test; the radar, scoring and diagnosis adapt automatically.
+   8 dimensions of digital maturity · 4 questions each.
+   Each question is answered with a traffic light (red/amber/green)
+   that maps to a 0-10 score, so the radar, scoring and diagnosis
+   keep working unchanged. This is the single source of truth:
+   edit here and the rest of the app adapts automatically.
    ============================================================ */
 
 export const QUESTIONNAIRE: Questionnaire = {
   id: "madurez-digital",
-  version: "1.0",
+  version: "2.0",
   title: "Diagnóstico de Madurez Digital",
   scale: {
     min: 0,
     max: 10,
-    step: 0.5,
+    step: 5,
     anchors: [
       { value: 0, label: "No existe" },
       { value: 5, label: "En desarrollo" },
       { value: 10, label: "Consolidado" },
     ],
   },
+  // The three answers shown as a traffic light on every question.
+  // value feeds the 0-10 engine: rojo = 0, amarillo = 5, verde = 10.
+  responseOptions: [
+    { id: "no", tone: "red", label: "No", hint: "Todavía no", value: 0 },
+    {
+      id: "parcial",
+      tone: "amber",
+      label: "Más o menos",
+      hint: "Tal vez / no sé",
+      value: 5,
+    },
+    { id: "si", tone: "green", label: "Sí", hint: "Ya lo hacemos", value: 10 },
+  ],
   maturityLevels: [
     {
       id: 1,

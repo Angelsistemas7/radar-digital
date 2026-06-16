@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { DIMENSIONS, QUESTIONNAIRE } from "@/lib/questionnaire";
 import { answeredCount, totalQuestions } from "@/lib/scoring";
-import { ScaleSlider } from "./scale-slider";
+import { TrafficLight } from "./traffic-light";
 import { DimensionIcon } from "@/components/ui/dimension-icon";
 import { buttonClasses } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -122,7 +122,12 @@ export function Questionnaire({
             </div>
           </div>
 
-          <div className="mt-7 space-y-7">
+          {/* how to answer */}
+          <p className="mt-5 rounded-xl bg-elevated/60 px-3.5 py-2.5 text-xs text-muted">
+            En cada pregunta, enciende la luz del semáforo que corresponda.
+          </p>
+
+          <div className="mt-6 space-y-7">
             {dim.questions.map((q, qi) => (
               <div
                 key={q.id}
@@ -132,11 +137,10 @@ export function Questionnaire({
                   <span className="text-faint">{qi + 1}.</span>
                   <span>{q.text}</span>
                 </p>
-                <ScaleSlider
+                <TrafficLight
                   value={answers[q.id]}
                   onChange={(v) => onAnswer(q.id, v)}
-                  anchors={QUESTIONNAIRE.scale.anchors}
-                  max={QUESTIONNAIRE.scale.max}
+                  options={QUESTIONNAIRE.responseOptions}
                 />
               </div>
             ))}
