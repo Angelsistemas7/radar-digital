@@ -14,6 +14,7 @@ import {
   Handshake,
   Rocket,
   Loader2,
+  Share2,
 } from "lucide-react";
 import { RadarChart, type RadarDatum } from "./radar-chart";
 import { AiAdvisor } from "./ai-advisor";
@@ -22,6 +23,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
 import { downloadReport } from "@/lib/pdf";
+import { shareResultCard } from "@/lib/share-card";
 import { clearState } from "@/lib/storage";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
 import { cn, formatScore } from "@/lib/utils";
@@ -180,6 +182,19 @@ export function ResultView({
   // finish + lead capture
   const [wantsContact, setWantsContact] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
+  const [sharing, setSharing] = useState(false);
+
+  const handleShare = async () => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      await shareResultCard(result, company);
+    } catch {
+      /* never block the UI if image generation/share fails */
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const handleFinish = async () => {
     if (wantsContact === null || sending) return;
@@ -661,13 +676,28 @@ export function ResultView({
               </fieldset>
 
               <div className="mt-7 flex flex-col gap-3 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  type="button"
-                  onClick={() => downloadReport(result, company, sector)}
-                  className={buttonClasses("secondary", "md")}
-                >
-                  <Download className="size-4" /> Descargar PDF
-                </button>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => downloadReport(result, company, sector)}
+                    className={buttonClasses("secondary", "md")}
+                  >
+                    <Download className="size-4" /> Descargar PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    disabled={sharing}
+                    className={buttonClasses("secondary", "md")}
+                  >
+                    {sharing ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Share2 className="size-4" />
+                    )}
+                    Compartir imagen
+                  </button>
+                </div>
                 <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
                   {onRestart && (
                     <button

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { DIMENSIONS, QUESTIONNAIRE } from "@/lib/questionnaire";
 import { answeredCount, totalQuestions } from "@/lib/scoring";
@@ -50,6 +50,30 @@ export function Questionnaire({
     if (next < 0) return onExit();
     if (next >= DIMENSIONS.length) return onFinish();
     navigate(next, delta);
+  };
+
+  const reduce = useReducedMotion();
+
+  // Save the answer, then gently move forward: scroll to the next unanswered
+  // question, or auto-advance to the next section once this one is complete.
+  const handleAnswer = (qid: string, qi: number, value: number) => {
+    onAnswer(qid, value);
+    const next = dim.questions[qi + 1];
+    if (next) {
+      if (typeof answers[next.id] !== "number") {
+        requestAnimationFrame(() =>
+          document.getElementById(`q-${next.id}`)?.scrollIntoView({
+            behavior: reduce ? "auto" : "smooth",
+            block: "center",
+          }),
+        );
+      }
+    } else {
+      const complete = dim.questions.every(
+        (q) => q.id === qid || typeof answers[q.id] === "number",
+      );
+      if (complete && !isLast) window.setTimeout(() => go(1), 550);
+    }
   };
 
   return (
@@ -131,7 +155,8 @@ export function Questionnaire({
             {dim.questions.map((q, qi) => (
               <div
                 key={q.id}
-                className="border-t border-border/60 pt-6 first:border-0 first:pt-0"
+                id={`q-${q.id}`}
+                className="scroll-mt-24 border-t border-border/60 pt-6 first:border-0 first:pt-0"
               >
                 <p className="mb-4 flex gap-2 text-[15px] font-medium text-foreground/95">
                   <span className="text-faint">{qi + 1}.</span>
@@ -139,7 +164,7 @@ export function Questionnaire({
                 </p>
                 <TrafficLight
                   value={answers[q.id]}
-                  onChange={(v) => onAnswer(q.id, v)}
+                  onChange={(v) => handleAnswer(q.id, qi, v)}
                   options={QUESTIONNAIRE.responseOptions}
                 />
               </div>
