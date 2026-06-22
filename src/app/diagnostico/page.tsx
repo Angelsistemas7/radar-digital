@@ -7,7 +7,7 @@ import { AssessmentFlow } from "@/components/assessment/assessment-flow";
 export const metadata: Metadata = {
   title: "Diagnóstico de Madurez Digital",
   description:
-    "Responde el cuestionario y descubre la madurez digital de tu empresa en 8 dimensiones.",
+    "Responde el cuestionario y descubre la madurez digital de tu empresa en 4 dimensiones.",
 };
 
 export default function DiagnosticoPage() {

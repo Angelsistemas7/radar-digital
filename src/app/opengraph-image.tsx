@@ -59,11 +59,11 @@ export default function Image() {
             maxWidth: 860,
           }}
         >
-          Diagnóstico en 8 dimensiones + plan de acción personalizado
+          Diagnóstico en 4 dimensiones + plan de acción personalizado
         </div>
 
         <div style={{ display: "flex", gap: 14, marginTop: 46 }}>
-          {["Estrategia", "Datos", "Cliente", "Ciberseguridad"].map((t) => (
+          {["Estrategia", "Cultura", "Cliente", "Procesos"].map((t) => (
             <div
               key={t}
               style={{

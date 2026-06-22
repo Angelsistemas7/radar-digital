@@ -23,3 +23,41 @@ export function formatScore(value: number) {
     maximumFractionDigits: 1,
   });
 }
+
+/* ---- Gradual traffic-light color for a 0-10 score ---- */
+
+const COLOR_STOPS: [number, string][] = [
+  [0, "#ef4444"], // rojo
+  [5, "#f59e0b"], // amarillo
+  [9, "#22c55e"], // verde
+  [10, "#16a34a"], // verde intenso
+];
+
+function hexToRgb(h: string): [number, number, number] {
+  const n = parseInt(h.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function lerpHex(a: string, b: string, t: number): string {
+  const A = hexToRgb(a);
+  const B = hexToRgb(b);
+  const ch = (i: number) =>
+    Math.round(A[i] + (B[i] - A[i]) * t)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${ch(0)}${ch(1)}${ch(2)}`;
+}
+
+/** Smooth red → amber → green color for a 0-10 score (gradual tonality). */
+export function scoreColor(score: number): string {
+  const s = clamp(score, 0, 10);
+  for (let i = 1; i < COLOR_STOPS.length; i++) {
+    const [x1, c1] = COLOR_STOPS[i - 1];
+    const [x2, c2] = COLOR_STOPS[i];
+    if (s <= x2) {
+      const t = x2 === x1 ? 0 : (s - x1) / (x2 - x1);
+      return lerpHex(c1, c2, t);
+    }
+  }
+  return COLOR_STOPS[COLOR_STOPS.length - 1][1];
+}

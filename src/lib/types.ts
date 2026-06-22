@@ -48,7 +48,7 @@ export interface Dimension {
   recommendations: Record<RecommendationBand, string[]>;
 }
 
-export type MaturityLevelId = 1 | 2 | 3 | 4 | 5;
+export type MaturityLevelId = 1 | 2 | 3;
 
 export interface MaturityLevel {
   id: MaturityLevelId;

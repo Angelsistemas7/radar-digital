@@ -29,7 +29,7 @@ const STEPS = [
 ];
 
 const FEATURES = [
-  "Radar interactivo de las 8 dimensiones",
+  "Diagnóstico visual de las 4 dimensiones",
   "Fortalezas y debilidades priorizadas",
   "Nivel de madurez: de Incipiente a Líder Digital",
   "Plan de acción por fases (0–3, 3–6, 6–12 meses)",
@@ -93,7 +93,7 @@ export default function Home() {
         >
           <div className="mx-auto max-w-6xl px-5">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <Eyebrow>Las 8 dimensiones</Eyebrow>
+              <Eyebrow>Las 4 dimensiones</Eyebrow>
               <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 Evaluamos tu madurez digital de forma integral
               </h2>

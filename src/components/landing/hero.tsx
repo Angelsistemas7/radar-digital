@@ -38,7 +38,7 @@ export function Hero() {
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/60" />
               <span className="relative inline-flex size-2 rounded-full bg-primary" />
             </span>
-            Diagnóstico gratuito · 8 dimensiones
+            Diagnóstico gratuito · 4 dimensiones
           </motion.span>
 
           <motion.h1
