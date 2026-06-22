@@ -115,13 +115,14 @@
   );
 }
 
-/* "glass" kept as a class name; now a clean white card. */
+/* "glass" kept as a class name; now a clean white card with layered depth. */
 .glass {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   box-shadow:
     0 1px 2px rgba(15, 23, 42, 0.04),
-    0 12px 28px -16px rgba(15, 23, 42, 0.12);
+    0 10px 20px -10px rgba(15, 23, 42, 0.10),
+    0 30px 54px -30px rgba(15, 23, 42, 0.18);
 }
 
 .glow-primary {
@@ -136,13 +137,15 @@
 }
 
 .card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 .card-hover:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05),
-    0 22px 44px -18px rgba(15, 23, 42, 0.2);
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 18px 34px -14px rgba(15, 23, 42, 0.18),
+    0 38px 64px -30px rgba(15, 23, 42, 0.24);
   border-color: var(--color-border-strong);
 }
 
@@ -214,7 +217,9 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid color-mix(in oklab, var(--color-border-strong) 75%, transparent);
-  box-shadow: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 44px -28px rgba(0, 0, 0, 0.75);
 }
 .dark .glow-primary {
   box-shadow:
@@ -243,6 +248,8 @@
     radial-gradient(45% 45% at 85% 10%, color-mix(in oklab, var(--color-accent) 14%, transparent), transparent 70%);
 }
 .dark .card-hover:hover {
-  box-shadow: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 28px 56px -26px rgba(0, 0, 0, 0.85);
   border-color: var(--color-border-strong);
 }

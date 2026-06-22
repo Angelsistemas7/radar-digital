@@ -53,15 +53,19 @@ function Kpi({
   accent: string;
 }) {
   return (
-    <div className="glass rounded-2xl p-5">
-      <div
-        className="flex size-10 items-center justify-center rounded-xl"
-        style={{ backgroundColor: `${accent}1f`, color: accent }}
-      >
-        <Icon className="size-5" />
+    <div className="glass card-hover rounded-2xl p-5">
+      <div className="flex items-center gap-2.5">
+        <span
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl"
+          style={{ backgroundColor: `${accent}1f`, color: accent }}
+        >
+          <Icon className="size-5" />
+        </span>
+        <p className="text-xs font-medium leading-tight text-muted">{label}</p>
       </div>
-      <p className="mt-3 text-2xl font-bold tracking-tight">{value}</p>
-      <p className="text-sm text-muted">{label}</p>
+      <p className="mt-3.5 font-display text-[26px] font-bold leading-none tracking-tight tabular-nums">
+        {value}
+      </p>
     </div>
   );
 }
@@ -114,11 +118,28 @@ export default async function AdminPage() {
       </header>
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">Resumen de diagnósticos</h1>
-          <p className="text-sm text-muted">
-            Datos agregados de todas las empresas que han completado el test.
-          </p>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold tracking-tight">
+              Resumen de diagnósticos
+            </h1>
+            <p className="text-sm text-muted">
+              Datos agregados de todas las empresas que han completado el test.
+            </p>
+          </div>
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${
+              configured
+                ? "border-success/30 bg-success/10 text-success"
+                : "border-warning/30 bg-warning/10 text-warning"
+            }`}
+          >
+            <span
+              className={`size-1.5 rounded-full ${configured ? "bg-success" : "bg-warning"}`}
+            />
+            {configured ? "Datos en vivo" : "Datos de ejemplo"} · {summary.total}{" "}
+            {summary.total === 1 ? "registro" : "registros"}
+          </span>
         </div>
 
         {!configured && (

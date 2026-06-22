@@ -40,7 +40,7 @@ const FEATURES = [
 const SAMPLE = DIMENSIONS.map((d, i) => ({
   label: d.name,
   color: d.color,
-  value: [7.6, 5.1, 8.3, 4.2, 6.7, 5.6, 7.2, 4.0][i] ?? 6,
+  value: [7.5, 5, 8.75, 3.75, 6.25, 5, 7.5, 3.75][i] ?? 6,
 }));
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -105,12 +105,22 @@ export default function Home() {
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {DIMENSIONS.map((d, i) => (
                 <Reveal key={d.id} delay={(i % 4) * 0.08}>
-                  <div className="card-hover glass h-full rounded-2xl p-6">
-                    <div
-                      className="flex size-11 items-center justify-center rounded-xl"
-                      style={{ backgroundColor: `${d.color}1f`, color: d.color }}
-                    >
-                      <DimensionIcon name={d.icon} className="size-5" />
+                  <div className="card-hover glass relative h-full overflow-hidden rounded-2xl p-6">
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-0 top-0 h-1"
+                      style={{ backgroundColor: d.color }}
+                    />
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="flex size-11 items-center justify-center rounded-xl"
+                        style={{ backgroundColor: `${d.color}1f`, color: d.color }}
+                      >
+                        <DimensionIcon name={d.icon} className="size-5" />
+                      </span>
+                      <span className="font-mono text-xs text-faint">
+                        Eje {String(i + 1).padStart(2, "0")}
+                      </span>
                     </div>
                     <h3 className="mt-4 font-semibold">{d.title}</h3>
                     <p className="mt-1.5 text-sm text-muted">{d.description}</p>

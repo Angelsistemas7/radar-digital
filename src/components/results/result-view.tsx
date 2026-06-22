@@ -15,6 +15,10 @@ import {
   Rocket,
   Loader2,
   Share2,
+  Gauge,
+  TrendingUp,
+  TrendingDown,
+  type LucideIcon,
 } from "lucide-react";
 import { RadarChart, type RadarDatum } from "./radar-chart";
 import { AiAdvisor } from "./ai-advisor";
@@ -134,23 +138,38 @@ const PRIORITY_TAG = {
 } as const;
 
 function Widget({
+  icon: Icon,
   label,
   value,
   sub,
   color,
 }: {
+  icon: LucideIcon;
   label: string;
   value: string;
   sub?: string;
   color: string;
 }) {
   return (
-    <div className="glass rounded-2xl p-4">
-      <p className="text-xs text-faint">{label}</p>
-      <p className="mt-1 truncate text-base font-bold" style={{ color }}>
+    <div className="glass card-hover rounded-2xl p-4">
+      <div className="flex items-center gap-2">
+        <span
+          className="flex size-7 shrink-0 items-center justify-center rounded-lg"
+          style={{ backgroundColor: `${color}1f`, color }}
+        >
+          <Icon className="size-4" />
+        </span>
+        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-faint">
+          {label}
+        </p>
+      </div>
+      <p
+        className="mt-2.5 truncate font-display text-lg font-bold leading-tight"
+        style={{ color }}
+      >
         {value}
       </p>
-      {sub && <p className="truncate text-xs text-muted">{sub}</p>}
+      {sub && <p className="mt-0.5 truncate text-xs text-muted tabular-nums">{sub}</p>}
     </div>
   );
 }
@@ -318,23 +337,34 @@ export function ResultView({
       <Reveal className="print:hidden">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Widget
+            icon={Gauge}
             label="Nivel de madurez"
             value={result.level.name}
+            sub={`${formatScore(result.overall)} / 10 global`}
             color={result.level.color}
           />
           <Widget
+            icon={Trophy}
             label="Más fuerte"
             value={result.strengths[0]?.name ?? "—"}
-            sub={`${formatScore(result.strengths[0]?.score ?? 0)}/10`}
+            sub={`${formatScore(result.strengths[0]?.score ?? 0)} / 10`}
             color="#059669"
           />
           <Widget
+            icon={TriangleAlert}
             label="A reforzar"
             value={result.weaknesses[0]?.name ?? "—"}
-            sub={`${formatScore(result.weaknesses[0]?.score ?? 0)}/10`}
+            sub={`${formatScore(result.weaknesses[0]?.score ?? 0)} / 10`}
             color="#dc2626"
           />
           <Widget
+            icon={
+              compareOverall == null
+                ? Gauge
+                : result.overall >= compareOverall
+                  ? TrendingUp
+                  : TrendingDown
+            }
             label="Vs tu sector"
             value={
               compareOverall != null
@@ -343,10 +373,16 @@ export function ResultView({
             }
             sub={
               compareOverall != null
-                ? `sector: ${formatScore(compareOverall)}/10`
+                ? `sector: ${formatScore(compareOverall)} / 10`
                 : "calculando…"
             }
-            color="#0e7490"
+            color={
+              compareOverall == null
+                ? "#0e7490"
+                : result.overall >= compareOverall
+                  ? "#059669"
+                  : "#dc2626"
+            }
           />
         </div>
       </Reveal>
