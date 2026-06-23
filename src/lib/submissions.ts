@@ -247,6 +247,8 @@ export interface AdminSummary {
   dimensionAverages: { dimensionId: string; name: string; color: string; avg: number }[];
   bySector: { sector: string; count: number; avg: number }[];
   byCountry: { country: string; count: number }[];
+  byEducationLevel: { label: string; count: number }[];
+  byGender: { label: string; count: number }[];
   timeline: { date: string; count: number }[];
 }
 
@@ -299,6 +301,24 @@ export function summarize(rows: SubmissionRow[]): AdminSummary {
     .map(([date, count]) => ({ date, count }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
+  const eduMap = new Map<string, number>();
+  rows.forEach((r) => {
+    const key = r.education_level || "No especificado";
+    eduMap.set(key, (eduMap.get(key) ?? 0) + 1);
+  });
+  const byEducationLevel = [...eduMap.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count);
+
+  const genderMap = new Map<string, number>();
+  rows.forEach((r) => {
+    const key = r.gender || "No especificado";
+    genderMap.set(key, (genderMap.get(key) ?? 0) + 1);
+  });
+  const byGender = [...genderMap.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count);
+
   const best = [...levelDistribution].sort((a, b) => b.count - a.count)[0];
   const topLevel = best && best.count > 0 ? { name: best.name, color: best.color } : null;
 
@@ -311,6 +331,8 @@ export function summarize(rows: SubmissionRow[]): AdminSummary {
     dimensionAverages,
     bySector,
     byCountry,
+    byEducationLevel,
+    byGender,
     timeline,
   };
 }

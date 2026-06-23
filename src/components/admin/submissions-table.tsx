@@ -327,6 +327,7 @@ export function SubmissionsTable({ rows }: { rows: SubmissionRow[] }) {
                     <Field label="País" value={detail.country} />
                     <Field label="Sector" value={detail.sector} />
                     <Field label="Género" value={detail.gender} />
+                    <Field label="Nivel educativo" value={detail.education_level} />
                     <Field label="Fecha" value={detail.created_at?.slice(0, 10)} />
                   </div>
 

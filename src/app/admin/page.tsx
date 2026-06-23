@@ -12,6 +12,8 @@ import {
   Database,
   Layers,
   Handshake,
+  GraduationCap,
+  Venus,
 } from "lucide-react";
 import { LogoLockup } from "@/components/ui/logo";
 import { LogoutButton } from "@/components/admin/logout-button";
@@ -22,6 +24,8 @@ import {
   TimelineChart,
   CountryChart,
   SectorChart,
+  EducationChart,
+  GenderChart,
 } from "@/components/admin/admin-charts";
 import { SubmissionsTable } from "@/components/admin/submissions-table";
 import {
@@ -252,6 +256,32 @@ export default async function AdminPage() {
           ) : (
             <EmptyChart />
           )}
+        </div>
+
+        {/* Education + Gender */}
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="glass rounded-3xl p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <GraduationCap className="size-5 text-primary" />
+              <h2 className="text-lg font-semibold">Nivel educativo</h2>
+            </div>
+            {summary.byEducationLevel.length > 0 ? (
+              <EducationChart data={summary.byEducationLevel} />
+            ) : (
+              <EmptyChart />
+            )}
+          </div>
+          <div className="glass rounded-3xl p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Venus className="size-5 text-primary" />
+              <h2 className="text-lg font-semibold">Distribución por género</h2>
+            </div>
+            {summary.byGender.length > 0 ? (
+              <GenderChart data={summary.byGender} />
+            ) : (
+              <EmptyChart />
+            )}
+          </div>
         </div>
 
         {/* Table */}

@@ -173,6 +173,64 @@ export function CountryChart({ data }: { data: AdminSummary["byCountry"] }) {
   );
 }
 
+export function EducationChart({ data }: { data: AdminSummary["byEducationLevel"] }) {
+  const colors = useThemeColors();
+  const axisTick = axisTickOf(colors);
+  const tooltipStyle = tooltipStyleOf(colors);
+  const EDU_COLORS = ["#0e7490", "#4f46e5", "#34d399", "#d97706", "#db2777", "#7c3aed"];
+  return (
+    <ResponsiveContainer width="100%" height={Math.max(180, data.length * 34)}>
+      <BarChart data={data} layout="vertical" margin={{ top: 0, right: 40, bottom: 0, left: 8 }}>
+        <XAxis type="number" allowDecimals={false} tick={axisTick} axisLine={false} tickLine={false} />
+        <YAxis
+          type="category"
+          dataKey="label"
+          tick={axisTick}
+          axisLine={false}
+          tickLine={false}
+          width={180}
+        />
+        <Tooltip
+          contentStyle={tooltipStyle}
+          cursor={{ fill: "rgba(255,255,255,0.04)" }}
+          formatter={(v) => [`${v} personas`, "Cantidad"]}
+        />
+        <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={18}>
+          {data.map((d, i) => (
+            <Cell key={d.label} fill={EDU_COLORS[i % EDU_COLORS.length]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function GenderChart({ data }: { data: AdminSummary["byGender"] }) {
+  const colors = useThemeColors();
+  const axisTick = axisTickOf(colors);
+  const tooltipStyle = tooltipStyleOf(colors);
+  const GENDER_COLORS = ["#4f46e5", "#db2777", "#34d399", "#d97706", "#0e7490"];
+  return (
+    <ResponsiveContainer width="100%" height={Math.max(160, data.length * 40)}>
+      <BarChart data={data} margin={{ top: 8, right: 24, bottom: 0, left: -16 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+        <XAxis dataKey="label" tick={axisTick} axisLine={{ stroke: colors.grid }} tickLine={false} />
+        <YAxis allowDecimals={false} tick={axisTick} axisLine={false} tickLine={false} />
+        <Tooltip
+          contentStyle={tooltipStyle}
+          cursor={{ fill: "rgba(255,255,255,0.04)" }}
+          formatter={(v) => [`${v} personas`, "Cantidad"]}
+        />
+        <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+          {data.map((d, i) => (
+            <Cell key={d.label} fill={GENDER_COLORS[i % GENDER_COLORS.length]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function SectorChart({ data }: { data: AdminSummary["bySector"] }) {
   const colors = useThemeColors();
   const axisTick = axisTickOf(colors);
