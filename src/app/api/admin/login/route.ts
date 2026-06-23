@@ -7,6 +7,7 @@ import {
   adminCookieOptions,
 } from "@/lib/admin-auth";
 import { rateLimit } from "@/lib/rate-limit";
+import { getDb } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -38,6 +39,9 @@ export async function POST(req: NextRequest) {
   if (!checkAdminPassword(parsed.data.password)) {
     return NextResponse.json({ error: "Contraseña incorrecta" }, { status: 401 });
   }
+
+  // Pre-warm the DB pool while the client navigates to /admin.
+  void getDb()?.query("SELECT 1").catch(() => {});
 
   const res = NextResponse.json({ ok: true });
   res.cookies.set(ADMIN_COOKIE, createSessionToken(), adminCookieOptions);
