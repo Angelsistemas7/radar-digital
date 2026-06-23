@@ -19,6 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { DimensionIcon } from "@/components/ui/dimension-icon";
+import { Semaforo } from "@/components/ui/semaforo";
 import { Reveal } from "@/components/ui/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
@@ -38,39 +39,6 @@ function colorWord(score: number): string {
 
 function dimIcon(dimensionId: string): string {
   return QUESTIONNAIRE.dimensions.find((x) => x.id === dimensionId)?.icon ?? "";
-}
-
-/* ---------- big traffic light (gradual tonality via scoreColor) ---------- */
-function BigTrafficLight({ score }: { score: number }) {
-  // 0 = red lamp, 1 = amber lamp, 2 = green lamp
-  const active = score < 6.1 ? 0 : score < 9.1 ? 1 : 2;
-  const on = scoreColor(score);
-  const base = ["#ef4444", "#f59e0b", "#22c55e"];
-
-  return (
-    <div className="relative mx-auto flex w-[124px] shrink-0 flex-col items-center gap-4 rounded-[2.2rem] border border-white/10 bg-[#0b1220]/85 p-5 shadow-xl">
-      {base.map((c, i) => {
-        const lit = i === active;
-        return (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.12 + i * 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="size-[70px] rounded-full"
-            style={
-              lit
-                ? {
-                    background: `radial-gradient(circle at 35% 30%, rgba(255,255,255,0.55), ${on} 58%)`,
-                    boxShadow: `0 0 34px 5px ${on}, inset 0 2px 8px rgba(255,255,255,0.35)`,
-                  }
-                : { backgroundColor: c, opacity: 0.13 }
-            }
-          />
-        );
-      })}
-    </div>
-  );
 }
 
 /* ---------- per-dimension state row (color = its state) ---------- */
@@ -241,7 +209,7 @@ export function ResultView({
           <div className="relative grid items-center gap-8 lg:grid-cols-[auto_1fr]">
             {/* left: big gradual traffic light + level */}
             <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center lg:flex-col lg:items-center">
-              <BigTrafficLight score={result.overall} />
+              <Semaforo score={result.overall} />
               <div className="text-center sm:text-left lg:max-w-[18rem] lg:text-center">
                 {company && (
                   <p className="text-sm text-muted">
