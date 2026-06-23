@@ -224,7 +224,12 @@ export async function listSubmissions(): Promise<SubmissionRow[]> {
     const result = await db.query(
       "SELECT * FROM public.submissions ORDER BY created_at DESC LIMIT 2000",
     );
-    return result.rows as SubmissionRow[];
+    return result.rows.map((r) => ({
+      ...r,
+      // pg devuelve timestamptz como Date y numeric como string — normalizamos
+      created_at: r.created_at instanceof Date ? r.created_at.toISOString() : String(r.created_at),
+      overall_score: Number(r.overall_score),
+    })) as SubmissionRow[];
   }
 
   // 3. Sin base de datos — datos de ejemplo
