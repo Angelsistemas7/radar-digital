@@ -5,6 +5,7 @@ import { round1 } from "./utils";
 import type { Answers, Respondent } from "./types";
 import { SECTORS } from "./validation";
 import { appendToSheet } from "./sheets";
+import { getDb } from "./db";
 
 /** A row as stored in / read from the `submissions` table. */
 export interface SubmissionRow {
@@ -60,6 +61,27 @@ export async function saveSubmission(
     user_agent: meta.userAgent ?? null,
     ip_hash: meta.ipHash ?? null,
   };
+
+  // PostgreSQL local — fire and forget.
+  void (async () => {
+    const db = getDb();
+    if (!db) return;
+    await db.query(
+      `INSERT INTO public.submissions
+        (company,full_name,role,gender,email,phone,city,country,sector,
+         overall_score,level_id,dimensions,answers,user_agent,ip_hash)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+      [
+        respondent.company, respondent.fullName, respondent.role,
+        respondent.gender, respondent.email.toLowerCase(), respondent.phone,
+        respondent.city, respondent.country, respondent.sector,
+        result.overall, result.level.id,
+        JSON.stringify(result.dimensions.map((d) => ({ dimensionId: d.dimensionId, score: d.score }))),
+        JSON.stringify(answers),
+        meta.userAgent ?? null, meta.ipHash ?? null,
+      ],
+    );
+  })().catch(() => {});
 
   // Google Sheets — fire and forget.
   void appendToSheet({

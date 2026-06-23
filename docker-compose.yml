@@ -4,4 +4,26 @@ services:
     restart: unless-stopped
     env_file: .env.production
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3100:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: radar_digital
+      POSTGRES_USER: radar
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/schema-pg.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U radar -d radar_digital"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
