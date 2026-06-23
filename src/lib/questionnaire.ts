@@ -36,13 +36,13 @@ export const QUESTIONNAIRE: Questionnaire = {
     },
     { id: "si", tone: "green", label: "Sí", hint: "Ya lo hacemos", value: 10 },
   ],
-  // Qualitative states by color. Bands on a 0-10 scale: rojo 0-5,
-  // amarillo 5-9, verde 9-10. Names stay encouraging (no harsh judgement).
+  // Qualitative states by color. Bands on a 0-10 scale: rojo 0-6,
+  // amarillo 6.1-9, verde 9.1-10. Names stay encouraging (no harsh judgement).
   maturityLevels: [
     {
       id: 1,
       name: "Inicial",
-      range: [0, 5],
+      range: [0, 6.1],
       tagline: "Punto de partida",
       description:
         "La empresa está dando sus primeros pasos digitales. Hay una gran oportunidad de avanzar con acciones simples y de alto impacto.",
@@ -51,7 +51,7 @@ export const QUESTIONNAIRE: Questionnaire = {
     {
       id: 2,
       name: "En desarrollo",
-      range: [5, 9],
+      range: [6.1, 9.1],
       tagline: "Avanzando con buen pie",
       description:
         "La transformación digital ya está en marcha en varias áreas. El reto es consolidar e integrar lo que funciona.",
@@ -60,7 +60,7 @@ export const QUESTIONNAIRE: Questionnaire = {
     {
       id: 3,
       name: "Consolidado",
-      range: [9, 10.01],
+      range: [9.1, 10.01],
       tagline: "Referente digital",
       description:
         "Lo digital está integrado en la estrategia y la operación. La empresa puede optimizar con datos y marcar la pauta en su sector.",

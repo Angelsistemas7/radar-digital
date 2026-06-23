@@ -1,12 +1,16 @@
 # 🛰️ Radar Digital
 
 **Diagnóstico de Madurez Digital para empresas.** Un cuestionario web que mide la
-madurez digital en **8 dimensiones** y entrega un **radar interactivo**, un
-**diagnóstico** y un **plan de acción** por fases. Incluye un **panel administrador**
-con gráficas y exportación de datos.
+madurez digital en **4 dimensiones** y entrega un **semáforo digital** (resultado
+**cualitativo por colores, sin notas numéricas**), un **diagnóstico** y un **PDF**
+descargable. Incluye un **panel administrador** con gráficas y exportación de datos.
 
 > Construido con Next.js 16 (App Router), React 19, TypeScript, Tailwind v4,
 > Motion, Recharts y Supabase.
+
+> 🔄 **Cambios recientes y avisos de mantenimiento** (qué se rediseñó, qué quedó sin
+> uso y qué se puede dañar al tocar X): ver [`ARCHITECTURE.md`](./ARCHITECTURE.md)
+> → secciones «Cambios recientes» y «Riesgos y puntos a vigilar».
 
 ---
 
@@ -14,19 +18,23 @@ con gráficas y exportación de datos.
 
 - **Onboarding** con validación en vivo (Zod + react-hook-form) y **filtro anti-basura**
   (rechaza textos como `asasas`, correos temporales, teléfonos inválidos) + honeypot anti-bots.
-- **Cuestionario animado** sección por sección, slider 0–10 con color dinámico,
-  barra de progreso y **autoguardado** (se puede retomar si se cierra la página).
-- **Resultado** con radar SVG animado, puntaje global con anillo, nivel de madurez
-  (Incipiente → Líder Digital), fortalezas/debilidades y descarga en PDF.
-- **Diagnóstico + plan de acción** por reglas (0–3, 3–6, 6–12 meses), con la
-  interfaz lista para conectar IA generativa más adelante.
-- **Panel administrador** protegido: KPIs, radar agregado, distribución por nivel,
-  línea de tiempo, ranking por país, tabla filtrable y **exportación a CSV/Excel**.
+- **Cuestionario animado** sección por sección, respuesta con **semáforo**
+  (🔴 No · 🟡 Más o menos · 🟢 Sí), barra de progreso y **autoguardado**
+  (se puede retomar si se cierra la página).
+- **Resultado cualitativo (sin números)**: un **semáforo grande** con la luz del
+  estado encendida y las **4 áreas** coloreadas según su estado, más 4 indicadores
+  cualitativos, diagnóstico y descarga del **PDF "semáforo digital"**.
+- **Diagnóstico por reglas**: el plan de acción por fases (0–3, 3–6, 6–12 meses) se
+  conserva en el motor y se incluye en el **PDF** y el **correo de lead**, pero ya
+  **no** se muestra en la pantalla de resultados.
+- **Panel administrador** protegido: KPIs, distribución por nivel, línea de tiempo,
+  ranking por país, tabla filtrable y **exportación a CSV/Excel**.
 - **Ciberseguridad**: cabeceras de seguridad + CSP, validación en el servidor,
   rate limiting, sesión de admin firmada (HMAC, cookie httpOnly), RLS en la base de
   datos y consentimiento de datos (Ley 1581 / Habeas Data).
-- **Motor configurable**: las dimensiones y preguntas viven en un solo archivo; el
-  radar se adapta solo a 5, 8 o N ejes.
+- **Motor configurable**: dimensiones, preguntas, estados y umbrales viven en
+  `src/lib/`; cambia ahí y el resultado se adapta — **pero ojo con los umbrales
+  duplicados** (ver avisos en [`ARCHITECTURE.md`](./ARCHITECTURE.md)).
 
 ---
 
@@ -132,8 +140,8 @@ src/
 │  ├─ admin/                  # Panel + login
 │  └─ api/                    # /respuestas, /admin/login, /admin/logout
 ├─ components/
-│  ├─ assessment/             # Onboarding, cuestionario, slider
-│  ├─ results/                # Radar SVG + vista de resultados
+│  ├─ assessment/             # Onboarding, cuestionario (semáforo)
+│  ├─ results/                # Semáforo + vista de resultados (cualitativa)
 │  ├─ admin/                  # Gráficas, tabla, login
 │  ├─ landing/ · site/ · ui/  # Hero, header/footer, primitivas
 ├─ lib/                       # questionnaire, scoring, diagnosis, validation, supabase…
@@ -145,11 +153,12 @@ supabase/schema.sql           # Esquema de la base de datos
 
 ## 🛣️ Próximos pasos
 
-- **Asesor con IA**: conectar la API de Claude para un chatbot que explique las
-  debilidades y co-diseñe el plan de acción (la interfaz ya está preparada en
-  `src/lib/diagnosis.ts`).
-- Exportación directa a Google Drive / Sheets.
-- Comparativas por sector y benchmarking entre empresas.
+- **Asesor con IA**: el componente y el endpoint existen
+  (`components/results/ai-advisor.tsx`, `app/api/asesor`) pero **se quitaron de la
+  pantalla de resultados**. Decisión pendiente: reconectarlo o borrarlo (ver
+  [`ARCHITECTURE.md`](./ARCHITECTURE.md)).
+- Hacer el **correo de lead** también sin números (hoy aún muestra puntajes).
+- Exportación directa a Google Drive / Sheets; benchmarking entre empresas.
 
 ---
 

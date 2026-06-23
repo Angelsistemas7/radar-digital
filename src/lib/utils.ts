@@ -28,7 +28,7 @@ export function formatScore(value: number) {
 
 const COLOR_STOPS: [number, string][] = [
   [0, "#ef4444"], // rojo
-  [5, "#f59e0b"], // amarillo
+  [6, "#f59e0b"], // amarillo
   [9, "#22c55e"], // verde
   [10, "#16a34a"], // verde intenso
 ];

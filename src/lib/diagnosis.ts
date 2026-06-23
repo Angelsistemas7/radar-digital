@@ -8,7 +8,6 @@ import type {
   DimensionScore,
   Respondent,
 } from "./types";
-import { formatScore } from "./utils";
 
 function dimById(id: string) {
   return QUESTIONNAIRE.dimensions.find((d) => d.id === id)!;
@@ -49,9 +48,9 @@ export function generateDiagnosis(
   const headline = `${subject} se encuentra en un nivel ${result.level.name} de madurez digital.`;
 
   const summary =
-    `Con un puntaje global de ${formatScore(result.overall)}/10, ${subject} destaca en ` +
-    `${strongest?.name ?? "—"} (${formatScore(strongest?.score ?? 0)}) y tiene su mayor ` +
-    `oportunidad de mejora en ${weakest?.name ?? "—"} (${formatScore(weakest?.score ?? 0)}). ` +
+    `${subject} se ubica en un nivel ${result.level.name} de madurez digital. ` +
+    `Su mayor fortaleza está en ${strongest?.name ?? "—"} y su principal ` +
+    `oportunidad de mejora, en ${weakest?.name ?? "—"}. ` +
     result.level.description;
 
   const perDimension = [...result.dimensions]

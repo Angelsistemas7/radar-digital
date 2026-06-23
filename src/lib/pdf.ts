@@ -1,11 +1,15 @@
 import { jsPDF } from "jspdf";
 import { generateDiagnosis } from "./diagnosis";
 import { QUESTIONNAIRE } from "./questionnaire";
+import { levelForScore } from "./scoring";
+import { scoreColor } from "./utils";
 import type { AssessmentResult } from "./types";
 
 /* ============================================================
-   Radar Digital — Professional PDF report (vector, auto-download).
-   Built programmatically with jsPDF (no html2canvas).
+   Radar Digital — "Semáforo Digital" PDF report.
+   Qualitative (no numeric scores): a big traffic light whose lit
+   lamp reflects the overall state, plus one card per area colored
+   by its own state. Built programmatically with jsPDF.
    ============================================================ */
 
 type RGB = [number, number, number];
@@ -16,6 +20,15 @@ function hex(h: string): RGB {
     parseInt(s.slice(0, 2), 16),
     parseInt(s.slice(2, 4), 16),
     parseInt(s.slice(4, 6), 16),
+  ];
+}
+
+/** Blend two colors: t=0 -> a, t=1 -> b. */
+function mix(a: RGB, b: RGB, t: number): RGB {
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * t),
+    Math.round(a[1] + (b[1] - a[1]) * t),
+    Math.round(a[2] + (b[2] - a[2]) * t),
   ];
 }
 
@@ -34,14 +47,22 @@ function clean(s: string): string {
     .replace(/[^ -ÿ]/g, "");
 }
 
-const fmt = (n: number) => n.toFixed(1).replace(".", ",");
-
 const INK: RGB = [11, 16, 32];
 const MUTED: RGB = [90, 104, 133];
 const SOFT: RGB = [60, 70, 90];
 const LINE: RGB = [222, 228, 238];
 const PANEL: RGB = [249, 250, 252];
 const PRIMARY: RGB = [14, 116, 144];
+const HOUSING: RGB = [11, 18, 32]; // matches the on-screen traffic light (#0b1220)
+// Base color of each lamp position (red / amber / green).
+const LAMP_BASE: RGB[] = [
+  [239, 68, 68],
+  [245, 158, 11],
+  [34, 197, 94],
+];
+
+/** Traffic-light lamp index for a 0-10 score (0 red, 1 amber, 2 green). */
+const lampIndex = (score: number) => (score < 6.1 ? 0 : score < 9.1 ? 1 : 2);
 
 export function downloadReport(
   result: AssessmentResult,
@@ -70,11 +91,37 @@ export function downloadReport(
     opts?: { align?: "left" | "center" | "right" },
   ) => doc.text(clean(s), x, y, opts);
 
-  const polygon = (pts: number[][], style: string) => {
-    if (pts.length < 2) return;
-    const segs = pts.slice(1).map((p, i) => [p[0] - pts[i][0], p[1] - pts[i][1]]);
-    doc.lines(segs, pts[0][0], pts[0][1], [1, 1], style, true);
+  /** A big traffic-light lamp, mirroring the on-screen BigTrafficLight:
+   *  a lit lamp glows (halo) with a soft white highlight toward the
+   *  upper-left; an off lamp is a faint tint of its own position color. */
+  const bigLamp = (cx: number, cy: number, r: number, on: boolean, color: RGB) => {
+    if (on) {
+      fc(mix(HOUSING, color, 0.45)); // outer glow halo
+      doc.circle(cx, cy, r * 1.55, "F");
+      fc(mix(HOUSING, color, 0.78)); // inner glow
+      doc.circle(cx, cy, r * 1.22, "F");
+    }
+    // Every lamp shows its full color (like the on-screen traffic light);
+    // only the active one additionally gets the glow halo above.
+    fc(color);
+    doc.circle(cx, cy, r, "F");
+    fc(mix(color, [255, 255, 255], on ? 0.34 : 0.24)); // glossy radial highlight
+    doc.circle(cx - r * 0.12, cy - r * 0.18, r * 0.6, "F");
+    if (on) {
+      fc(mix(color, [255, 255, 255], 0.6));
+      doc.circle(cx - r * 0.2, cy - r * 0.26, r * 0.3, "F");
+    }
   };
+
+  /** A small solid indicator dot with a gloss highlight (area cards). */
+  const dot = (cx: number, cy: number, r: number, color: RGB) => {
+    fc(color);
+    doc.circle(cx, cy, r, "F");
+    fc(mix(color, [255, 255, 255], 0.45));
+    doc.circle(cx - r * 0.28, cy - r * 0.3, r * 0.3, "F");
+  };
+
+  const stateName = (score: number) => levelForScore(score).name;
 
   /* ---------------- Page 1 ---------------- */
 
@@ -88,7 +135,7 @@ export function downloadReport(
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(180, 190, 210);
-  text("Diagnóstico de Madurez Digital", M, 50);
+  text("Semáforo de Madurez Digital", M, 50);
   text(dateStr, W - M, 34, { align: "right" });
 
   // accent strip in the level color
@@ -108,177 +155,123 @@ export function downloadReport(
     text(`Sector: ${sector}`, W - M, y, { align: "right" });
   }
 
-  // hero: overall score + level + tagline + description
+  // hero: big traffic light + level (qualitative — no number)
   y = 116;
-  const heroH = 92;
+  const heroH = 206;
   fc(PANEL);
   dc(LINE);
   doc.setLineWidth(1);
-  doc.roundedRect(M, y, W - 2 * M, heroH, 10, 10, "FD");
+  doc.roundedRect(M, y, W - 2 * M, heroH, 14, 14, "FD");
   fc(lvl);
   doc.roundedRect(M, y, 5, heroH, 2, 2, "F");
 
-  tc(lvl);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(46);
-  text(fmt(result.overall), M + 28, y + 56);
-  const sw = doc.getTextWidth(fmt(result.overall));
-  doc.setFontSize(12);
-  tc(MUTED);
-  text("/ 10", M + 28 + sw + 8, y + 56);
+  // traffic-light housing with three lamps; the active one is lit (gradual color)
+  const tlW = 78;
+  const tlH = 182;
+  const tlX = M + 30;
+  const tlY = y + (heroH - tlH) / 2;
+  fc(HOUSING);
+  doc.roundedRect(tlX, tlY, tlW, tlH, 24, 24, "F");
+  dc(mix(HOUSING, [255, 255, 255], 0.12)); // subtle border, like the on-screen one
+  doc.setLineWidth(0.8);
+  doc.roundedRect(tlX, tlY, tlW, tlH, 24, 24, "S");
+  const lampCX = tlX + tlW / 2;
+  const lampR = 22;
+  const lampYs = [tlY + 36, tlY + 91, tlY + 146];
+  const activeIdx = lampIndex(result.overall);
+  const onColor = hex(scoreColor(result.overall));
+  lampYs.forEach((ly, i) =>
+    bigLamp(lampCX, ly, lampR, i === activeIdx, i === activeIdx ? onColor : LAMP_BASE[i]),
+  );
 
-  const tx = M + 168;
+  // level text to the right of the housing
+  const tx = tlX + tlW + 30;
   tc(INK);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  text(`Nivel ${result.level.name}`, tx, y + 28);
+  doc.setFontSize(22);
+  text(`Nivel ${result.level.name}`, tx, y + 86);
   tc(lvl);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
-  text(result.level.tagline.toUpperCase(), tx, y + 42);
+  text(result.level.tagline.toUpperCase(), tx, y + 102);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9.5);
+  doc.setFontSize(10);
   tc(MUTED);
   doc.text(
-    doc.splitTextToSize(clean(result.level.description), W - tx - M - 8),
+    doc.splitTextToSize(clean(result.level.description), W - tx - M - 12),
     tx,
-    y + 58,
+    y + 120,
   );
 
-  // maturity ladder — the 5 levels, current highlighted
-  y += heroH + 24;
-  const levels = QUESTIONNAIRE.maturityLevels;
-  const lg = 6;
-  const lw = (W - 2 * M - lg * (levels.length - 1)) / levels.length;
-  levels.forEach((L, i) => {
-    const lx = M + i * (lw + lg);
-    const active = L.id === result.level.id;
-    fc(active ? hex(L.color) : [237, 240, 245]);
-    doc.roundedRect(lx, y, lw, 22, 4, 4, "F");
-    if (active) doc.setTextColor(255, 255, 255);
-    else tc(MUTED);
-    doc.setFont("helvetica", active ? "bold" : "normal");
-    doc.setFontSize(7.6);
-    text(L.name, lx + lw / 2, y + 14, { align: "center" });
+  // the three states (legend) — current one highlighted
+  y += heroH + 26;
+  doc.setFontSize(9);
+  let lxp = M;
+  QUESTIONNAIRE.maturityLevels.forEach((s) => {
+    const cur = s.id === result.level.id;
+    fc(cur ? hex(s.color) : [205, 210, 220]);
+    doc.circle(lxp + 4, y - 3, 4, "F");
+    doc.setFont("helvetica", cur ? "bold" : "normal");
+    tc(cur ? INK : MUTED);
+    text(s.name, lxp + 13, y);
+    lxp += 13 + doc.getTextWidth(clean(s.name)) + 24;
   });
 
-  // strengths / weaknesses chips
-  y += 36;
-  const half = (W - 2 * M - 14) / 2;
-  const chip = (x: number, tag: string, name: string, score: number, c: RGB) => {
+  // section: one card per area, each colored by its own state
+  y += 28;
+  tc(INK);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  text("Tu semáforo por área", M, y);
+
+  y += 14;
+  const gap = 16;
+  const cardW = (W - 2 * M - gap) / 2;
+  const cardH = 58;
+  result.dimensions.forEach((d, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const cardX = M + col * (cardW + gap);
+    const cardY = y + row * (cardH + 14);
     fc(PANEL);
     dc(LINE);
     doc.setLineWidth(0.8);
-    doc.roundedRect(x, y, half, 28, 6, 6, "FD");
+    doc.roundedRect(cardX, cardY, cardW, cardH, 10, 10, "FD");
+    const dCol = hex(scoreColor(d.score));
+    dot(cardX + 26, cardY + cardH / 2, 8, dCol);
+    tc(INK);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11.5);
+    text(d.name, cardX + 50, cardY + 25);
+    tc(dCol);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    text(stateName(d.score), cardX + 50, cardY + 41);
+  });
+  y += 2 * cardH + 14 + 26;
+
+  // qualitative highlight chips (no scores)
+  const half = (W - 2 * M - 14) / 2;
+  const qchip = (x: number, tag: string, name: string, c: RGB) => {
+    fc(PANEL);
+    dc(LINE);
+    doc.setLineWidth(0.8);
+    doc.roundedRect(x, y, half, 32, 8, 8, "FD");
     fc(c);
-    doc.circle(x + 14, y + 14, 3.2, "F");
+    doc.circle(x + 16, y + 16, 3.6, "F");
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     tc(MUTED);
-    text(tag, x + 26, y + 12);
+    text(tag, x + 28, y + 13);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
+    doc.setFontSize(10.5);
     tc(INK);
-    text(name, x + 26, y + 22);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    tc(c);
-    text(fmt(score), x + half - 12, y + 18, { align: "right" });
+    text(name, x + 28, y + 25);
   };
   const strong = result.strengths[0];
   const weak = result.weaknesses[0];
-  if (strong) chip(M, "Más fuerte", strong.name, strong.score, [22, 163, 74]);
-  if (weak) chip(M + half + 14, "A reforzar", weak.name, weak.score, [220, 38, 38]);
-
-  // radar — centered
-  const cx = W / 2;
-  const cy = 430;
-  const R = 92;
-  const dims = result.dimensions;
-  const n = dims.length;
-  const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
-  const pt = (i: number, v: number): number[] => {
-    const r = (Math.min(Math.max(v, 0), 10) / 10) * R;
-    return [cx + r * Math.cos(ang(i)), cy + r * Math.sin(ang(i))];
-  };
-
-  dc([210, 216, 228]);
-  doc.setLineWidth(0.5);
-  [0.25, 0.5, 0.75, 1].forEach((ring) =>
-    polygon(dims.map((_, i) => pt(i, ring * 10)), "S"),
-  );
-  dims.forEach((_, i) => {
-    const p = pt(i, 10);
-    doc.line(cx, cy, p[0], p[1]);
-  });
-  const dpts = dims.map((d, i) => pt(i, d.score));
-  fc([34, 211, 238]);
-  const g = doc as unknown as {
-    saveGraphicsState?: () => void;
-    restoreGraphicsState?: () => void;
-    GState?: new (o: { opacity: number }) => unknown;
-    setGState?: (s: unknown) => void;
-  };
-  try {
-    if (g.saveGraphicsState && g.GState && g.setGState) {
-      g.saveGraphicsState();
-      g.setGState(new g.GState({ opacity: 0.25 }));
-      polygon(dpts, "F");
-      g.restoreGraphicsState?.();
-    } else {
-      polygon(dpts, "F");
-    }
-  } catch {
-    polygon(dpts, "F");
-  }
-  dc(PRIMARY);
-  doc.setLineWidth(1.2);
-  polygon(dpts, "S");
-  dims.forEach((d, i) => {
-    fc(hex(d.color));
-    doc.circle(dpts[i][0], dpts[i][1], 2.2, "F");
-  });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  tc(MUTED);
-  dims.forEach((d, i) => {
-    const a = ang(i);
-    const lx = cx + (R + 16) * Math.cos(a);
-    const ly = cy + (R + 16) * Math.sin(a);
-    const align = Math.cos(a) > 0.3 ? "left" : Math.cos(a) < -0.3 ? "right" : "center";
-    text(d.name, lx, ly + 2, { align });
-  });
-
-  // dimension bars — 2 columns below the radar
-  tc(INK);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  text("Puntaje por dimensión", M, cy + R + 36);
-
-  const colGap = 28;
-  const colW = (W - 2 * M - colGap) / 2;
-  const barsTop = cy + R + 52;
-  [...dims]
-    .sort((a, b) => b.score - a.score)
-    .forEach((d, i) => {
-      const col = i < 4 ? 0 : 1;
-      const row = i % 4;
-      const x = M + col * (colW + colGap);
-      const yy = barsTop + row * 24;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      tc(INK);
-      text(d.name, x, yy + 7);
-      const barX = x + 92;
-      const barW = colW - 92 - 30;
-      fc([235, 238, 244]);
-      doc.roundedRect(barX, yy, barW, 7, 3.5, 3.5, "F");
-      fc(hex(d.color));
-      doc.roundedRect(barX, yy, Math.max(2, (barW * d.score) / 10), 7, 3.5, 3.5, "F");
-      doc.setFont("helvetica", "bold");
-      tc(hex(d.color));
-      text(fmt(d.score), x + colW, yy + 7, { align: "right" });
-    });
+  if (strong) qchip(M, "Área más fuerte", strong.name, [22, 163, 74]);
+  if (weak) qchip(M + half + 14, "Qué reforzar", weak.name, [220, 38, 38]);
 
   /* ---------------- Page 2: diagnosis + plan ---------------- */
   doc.addPage();
@@ -317,7 +310,7 @@ export function downloadReport(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10.5);
     tc(hex(pd.color));
-    text(`${pd.name}   ${fmt(pd.score)}/10`, M + 12, y2);
+    text(`${pd.name}   ·   ${stateName(pd.score)}`, M + 12, y2);
     y2 += 14;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
@@ -348,11 +341,7 @@ export function downloadReport(
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9.5);
       tc(INK);
-      text(
-        `${item.dimensionName}  (${fmt(item.score)} -> ${fmt(item.target)})  ·  prioridad ${item.priority}`,
-        M + 12,
-        y2,
-      );
+      text(`${item.dimensionName}  ·  prioridad ${item.priority}`, M + 12, y2);
       y2 += 12;
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.8);
@@ -392,5 +381,5 @@ export function downloadReport(
     .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-+|-+$/g, "")
     .toLowerCase();
-  doc.save(`Radar-Digital-${slug || "reporte"}.pdf`);
+  doc.save(`Semaforo-Digital-${slug || "reporte"}.pdf`);
 }

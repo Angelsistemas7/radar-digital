@@ -18,10 +18,10 @@ export function levelForScore(score: number): MaturityLevel {
 }
 
 /** Coarse band used to pick tailored recommendations.
- *  Aligned with the traffic-light color bands (rojo <5, amarillo <9, verde). */
+ *  Aligned with the traffic-light color bands (rojo <6.1, amarillo <9.1, verde). */
 export function bandForScore(score: number): RecommendationBand {
-  if (score < 5) return "low";
-  if (score < 9) return "medium";
+  if (score < 6.1) return "low";
+  if (score < 9.1) return "medium";
   return "high";
 }
 
