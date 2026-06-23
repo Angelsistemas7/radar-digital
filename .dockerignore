@@ -1,0 +1,15 @@
+.git
+.gitignore
+.env*
+node_modules
+.next
+out
+*.log
+*.md
+.DS_Store
+scripts
+nginx
+supabase
+DEPLOY.md
+CLAUDE.md
+AGENTS.md
