@@ -10,6 +10,7 @@ import {
   GENDERS,
   COUNTRIES,
   SECTORS,
+  EDUCATION_LEVELS,
 } from "@/lib/validation";
 import { buttonClasses } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ import {
   MapPin,
   Globe,
   Layers,
+  GraduationCap,
   ShieldCheck,
   AlertCircle,
 } from "lucide-react";
@@ -150,12 +152,9 @@ export function OnboardingForm({
             {...register("phone")}
             type="tel"
             inputMode="tel"
-            placeholder="+57 300 123 4567"
+            placeholder="300 123 4567"
             className={cn(inputCls, errors.phone ? "border-danger" : "border-border")}
           />
-          {!errors.phone && (
-            <p className="mt-1.5 text-xs text-faint">Incluye el indicativo del país.</p>
-          )}
           <FieldError msg={errors.phone?.message} />
         </div>
 
@@ -214,6 +213,27 @@ export function OnboardingForm({
             </p>
           )}
           <FieldError msg={errors.sector?.message} />
+        </div>
+
+        {/* Education level — full width */}
+        <div className="sm:col-span-2">
+          <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground/90">
+            <GraduationCap className="size-4 text-faint" /> Nivel educativo
+          </label>
+          <select
+            {...register("educationLevel")}
+            className={cn(inputCls, errors.educationLevel ? "border-danger" : "border-border")}
+          >
+            <option value="" disabled>
+              Selecciona tu nivel educativo…
+            </option>
+            {EDUCATION_LEVELS.map((e) => (
+              <option key={e} value={e} className="bg-surface text-foreground">
+                {e}
+              </option>
+            ))}
+          </select>
+          <FieldError msg={errors.educationLevel?.message} />
         </div>
 
         {/* Gender — full width */}

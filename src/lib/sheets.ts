@@ -51,6 +51,7 @@ export async function appendToSheet(row: SheetRow): Promise<void> {
         row.respondent.city,
         row.respondent.country,
         row.respondent.sector,
+        row.respondent.educationLevel,
         String(row.overall).replace(".", ","),
         row.levelName,
         ...dimScores,

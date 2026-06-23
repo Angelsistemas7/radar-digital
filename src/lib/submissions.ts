@@ -20,6 +20,7 @@ export interface SubmissionRow {
   city: string;
   country: string;
   sector: string;
+  education_level: string;
   overall_score: number;
   level_id: number;
   dimensions: { dimensionId: string; score: number }[];
@@ -51,6 +52,7 @@ export async function saveSubmission(
     city: respondent.city,
     country: respondent.country,
     sector: respondent.sector,
+    education_level: respondent.educationLevel,
     overall_score: result.overall,
     level_id: result.level.id,
     dimensions: result.dimensions.map((d) => ({
@@ -68,13 +70,13 @@ export async function saveSubmission(
     if (!db) return;
     await db.query(
       `INSERT INTO public.submissions
-        (company,full_name,role,gender,email,phone,city,country,sector,
+        (company,full_name,role,gender,email,phone,city,country,sector,education_level,
          overall_score,level_id,dimensions,answers,user_agent,ip_hash)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
       [
         respondent.company, respondent.fullName, respondent.role,
         respondent.gender, respondent.email.toLowerCase(), respondent.phone,
-        respondent.city, respondent.country, respondent.sector,
+        respondent.city, respondent.country, respondent.sector, respondent.educationLevel,
         result.overall, result.level.id,
         JSON.stringify(result.dimensions.map((d) => ({ dimensionId: d.dimensionId, score: d.score }))),
         JSON.stringify(answers),
@@ -192,6 +194,7 @@ function demoRows(): SubmissionRow[] {
       city,
       country,
       sector: pick(sectors),
+      education_level: "",
       overall_score: overall,
       level_id: levelForScore(overall).id,
       dimensions,

@@ -103,6 +103,7 @@ export interface Respondent {
   city: string;
   country: string;
   sector: string;
+  educationLevel: string;
   consent: boolean;
 }
 

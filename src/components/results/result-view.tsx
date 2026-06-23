@@ -5,10 +5,7 @@ import { motion } from "motion/react";
 import {
   Trophy,
   TriangleAlert,
-  Download,
   RotateCcw,
-  Sparkles,
-  ArrowRight,
   CheckCircle2,
   Handshake,
   Rocket,
@@ -23,12 +20,11 @@ import { Semaforo } from "@/components/ui/semaforo";
 import { Reveal } from "@/components/ui/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
-import { downloadReport } from "@/lib/pdf";
 import { clearState } from "@/lib/storage";
 import { levelForScore } from "@/lib/scoring";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
 import { cn, scoreColor } from "@/lib/utils";
-import type { AssessmentResult, DimensionScore, RecommendationBand } from "@/lib/types";
+import type { AssessmentResult, DimensionScore } from "@/lib/types";
 
 /** Color word for a 0-10 score, aligned with the traffic-light bands. */
 function colorWord(score: number): string {
@@ -72,12 +68,6 @@ function SectionState({ d, index }: { d: DimensionScore; index: number }) {
     </motion.div>
   );
 }
-
-const BAND_TAG: Record<RecommendationBand, { label: string; cls: string }> = {
-  low: { label: "Prioridad alta", cls: "bg-danger/15 text-danger" },
-  medium: { label: "Por mejorar", cls: "bg-warning/15 text-warning" },
-  high: { label: "Fortaleza", cls: "bg-success/15 text-success" },
-};
 
 function Widget({
   icon: Icon,
@@ -279,51 +269,6 @@ export function ResultView({
         </div>
       </Reveal>
 
-      {/* diagnosis */}
-      <Reveal>
-        <div className="glass rounded-3xl p-6 sm:p-8">
-          <div className="mb-5 flex items-center gap-2">
-            <Sparkles className="size-5 text-primary" />
-            <h2 className="text-xl font-bold tracking-tight">Diagnóstico</h2>
-          </div>
-          <p className="max-w-3xl text-muted">{diagnosis.summary}</p>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {diagnosis.perDimension.map((d) => (
-              <div key={d.dimensionId} className="rounded-2xl border border-border/70 bg-surface/40 p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="flex size-8 shrink-0 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: `${d.color}1f`, color: d.color }}
-                    >
-                      <DimensionIcon name={dimIcon(d.dimensionId)} className="size-4" />
-                    </span>
-                    <h3 className="font-semibold">{d.name}</h3>
-                  </div>
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-0.5 text-xs font-medium",
-                      BAND_TAG[d.band].cls,
-                    )}
-                  >
-                    {BAND_TAG[d.band].label}
-                  </span>
-                </div>
-                <ul className="mt-3 space-y-2">
-                  {d.recommendations.map((r, i) => (
-                    <li key={i} className="flex gap-2 text-sm text-muted">
-                      <ArrowRight className="mt-0.5 size-4 shrink-0" style={{ color: d.color }} />
-                      <span>{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-
       {/* finish + lead capture */}
       <Reveal className="no-print">
         <div className="glass glow-accent relative overflow-hidden rounded-3xl p-6 sm:p-8">
@@ -366,40 +311,29 @@ export function ResultView({
               ))}
             </ul>
 
-            <div className="mt-7 flex flex-col gap-3 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <div className="mt-7 flex flex-col items-stretch gap-2 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+              {onRestart && (
                 <button
                   type="button"
-                  onClick={() => downloadReport(result, company, sector)}
-                  className={buttonClasses("secondary", "md")}
+                  onClick={onRestart}
+                  className={buttonClasses("ghost", "md")}
                 >
-                  <Download className="size-4" /> Descargar mi semáforo digital
+                  <RotateCcw className="size-4" /> Repetir test
                 </button>
-              </div>
-              <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
-                {onRestart && (
-                  <button
-                    type="button"
-                    onClick={onRestart}
-                    className={buttonClasses("ghost", "md")}
-                  >
-                    <RotateCcw className="size-4" /> Repetir test
-                  </button>
+              )}
+              <button
+                type="button"
+                onClick={handleFinish}
+                disabled={sending}
+                className={buttonClasses("primary", "md")}
+              >
+                {sending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Rocket className="size-4" />
                 )}
-                <button
-                  type="button"
-                  onClick={handleFinish}
-                  disabled={sending}
-                  className={buttonClasses("primary", "md")}
-                >
-                  {sending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Rocket className="size-4" />
-                  )}
-                  {sending ? "Guardando…" : "Terminar"}
-                </button>
-              </div>
+                {sending ? "Guardando…" : "Terminar"}
+              </button>
             </div>
           </div>
         </div>

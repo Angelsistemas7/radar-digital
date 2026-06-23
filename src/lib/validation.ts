@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { isValidPhoneNumber } from "libphonenumber-js";
 
 /* ============================================================
    Radar Digital — Input validation
@@ -7,6 +6,19 @@ import { isValidPhoneNumber } from "libphonenumber-js";
    and the server API route. Includes anti-gibberish heuristics so
    "asasas" style junk is rejected.
    ============================================================ */
+
+export const EDUCATION_LEVELS = [
+  "Ninguno / Sin educación formal",
+  "Básica Primaria",
+  "Básica Secundaria (Bachillerato)",
+  "Técnico",
+  "Tecnólogo",
+  "Profesional / Universitario",
+  "Especialización",
+  "Maestría",
+  "Doctorado",
+  "Otro",
+] as const;
 
 export const GENDERS = [
   "Hombre",
@@ -161,13 +173,11 @@ export const respondentSchema = z.object({
     .string()
     .trim()
     .min(7, "Escribe tu número de teléfono")
-    .refine((v) => {
-      try {
-        return isValidPhoneNumber(v);
-      } catch {
-        return false;
-      }
-    }, "Teléfono no válido. Incluye el indicativo, ej. +57 300 123 4567"),
+    .max(20, "Máximo 20 caracteres")
+    .refine(
+      (v) => /^[\d\s\-()+]{7,20}$/.test(v) && (v.match(/\d/g) ?? []).length >= 7,
+      "Teléfono no válido. Ej. 300 123 4567",
+    ),
   city: realText(2, "Indica tu ciudad"),
   country: z
     .string()
@@ -175,6 +185,12 @@ export const respondentSchema = z.object({
   sector: z
     .string()
     .refine((v) => (SECTORS as readonly string[]).includes(v), "Selecciona tu sector"),
+  educationLevel: z
+    .string()
+    .refine(
+      (v) => (EDUCATION_LEVELS as readonly string[]).includes(v),
+      "Selecciona tu nivel educativo",
+    ),
   consent: z
     .boolean()
     .refine((v) => v === true, "Necesitamos tu autorización para continuar"),
@@ -192,5 +208,6 @@ export const emptyRespondent: RespondentInput = {
   city: "",
   country: "Colombia",
   sector: "",
+  educationLevel: "",
   consent: false,
 };
