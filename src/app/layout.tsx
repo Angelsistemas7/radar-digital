@@ -57,8 +57,9 @@ export const viewport: Viewport = {
   themeColor: "#f6f7f9",
 };
 
-// Set the theme before paint to avoid a flash of the wrong theme.
-const themeScript = `(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
+// Modo claro por defecto en todo el sitio. Limpiamos cualquier preferencia
+// oscura antigua para que nadie quede atrapado en el tema oscuro (se quitó).
+const themeScript = `(function(){try{localStorage.removeItem('theme');document.documentElement.classList.remove('dark');}catch(e){}})();`;
 
 export default function RootLayout({
   children,

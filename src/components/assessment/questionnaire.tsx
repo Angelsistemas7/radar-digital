@@ -13,6 +13,25 @@ import type { Answers } from "@/lib/types";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+/** Desplazamiento suave y controlado (más lento/gentil que el scroll nativo). */
+function animatedScrollTo(el: HTMLElement, duration: number) {
+  const startY = window.scrollY;
+  const rect = el.getBoundingClientRect();
+  const targetY = startY + rect.top - (window.innerHeight - rect.height) / 2;
+  const dist = targetY - startY;
+  if (Math.abs(dist) < 2) return;
+  let startTs: number | null = null;
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // easeInOutCubic
+  const step = (ts: number) => {
+    if (startTs === null) startTs = ts;
+    const p = Math.min((ts - startTs) / duration, 1);
+    window.scrollTo(0, startY + dist * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 export function Questionnaire({
   sectionIndex,
   onSectionChange,
@@ -67,18 +86,18 @@ export function Questionnaire({
     const next = dim.questions[qi + 1];
     if (next) {
       if (typeof answers[next.id] !== "number") {
-        requestAnimationFrame(() =>
-          document.getElementById(`q-${next.id}`)?.scrollIntoView({
-            behavior: reduce ? "auto" : "smooth",
-            block: "center",
-          }),
-        );
+        requestAnimationFrame(() => {
+          const el = document.getElementById(`q-${next.id}`);
+          if (!el) return;
+          if (reduce) el.scrollIntoView({ block: "center" });
+          else animatedScrollTo(el, 900); // un poco más lento, más suave
+        });
       }
     } else {
       const complete = dim.questions.every(
         (q) => q.id === qid || typeof answers[q.id] === "number",
       );
-      if (complete && !isLast) window.setTimeout(() => go(1), 550);
+      if (complete && !isLast) window.setTimeout(() => go(1), 700);
     }
   };
 
@@ -151,10 +170,10 @@ export function Questionnaire({
       <AnimatePresence mode="wait" custom={dir}>
         <motion.div
           key={sectionIndex}
-          initial={{ opacity: 0, x: dir * 40 }}
+          initial={{ opacity: 0, x: dir * 24 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: dir * -40 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          exit={{ opacity: 0, x: dir * -24 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="glass overflow-hidden rounded-3xl"
         >
           {/* dimension header with a color accent */}
@@ -202,11 +221,22 @@ export function Questionnaire({
           <div className="space-y-1 px-6 pb-6 pt-4 sm:px-8 sm:pb-8">
             {dim.questions.map((q, qi) => {
               const answered = typeof answers[q.id] === "number";
+              const tone =
+                answered
+                  ? ({ 0: "#ef4444", 5: "#f59e0b", 10: "#22c55e" } as Record<number, string>)[
+                      answers[q.id] as number
+                    ]
+                  : undefined;
               return (
                 <div
                   key={q.id}
                   id={`q-${q.id}`}
-                  className="scroll-mt-24 border-t border-border/60 py-6 first:border-0 first:pt-2"
+                  className="scroll-mt-24 rounded-2xl border-t border-border/60 px-3 py-6 transition-[background-color,box-shadow] duration-500 first:border-0 first:pt-2 sm:px-4"
+                  style={
+                    tone
+                      ? { backgroundColor: `${tone}0d`, boxShadow: `inset 4px 0 0 0 ${tone}` }
+                      : undefined
+                  }
                 >
                   <div className="mb-4 flex gap-3">
                     <span

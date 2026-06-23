@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { Hero } from "@/components/landing/hero";
 import { Reveal } from "@/components/ui/reveal";
 import { DimensionIcon } from "@/components/ui/dimension-icon";
-import { Semaforo } from "@/components/ui/semaforo";
+import { SemaforoCycle } from "@/components/ui/semaforo";
 import { buttonClasses } from "@/components/ui/button";
 import { DIMENSIONS } from "@/lib/questionnaire";
 import { totalQuestions } from "@/lib/scoring";
@@ -13,28 +13,29 @@ import { totalQuestions } from "@/lib/scoring";
 const STEPS = [
   {
     icon: ClipboardList,
-    title: "Responde el cuestionario",
+    title: "Responde el autodiagnóstico",
     text: `${totalQuestions()} preguntas en ${DIMENSIONS.length} dimensiones. Respondes con un semáforo: verde (sí), amarillo (más o menos) o rojo (no). Te toma unos 5 minutos.`,
   },
   {
     icon: TrafficCone,
-    title: "Tu semáforo digital",
-    text: "Obtén al instante tu semáforo digital que revela tus fortalezas y áreas de mejora.",
+    title: "Mira tu semáforo digital",
+    text: "Al instante obtienes tu semáforo —rojo, amarillo o verde— con tus fortalezas y tus áreas por reforzar.",
   },
   {
     icon: Rocket,
-    title: "Recibe tu plan de acción",
-    text: "Un diagnóstico claro y un plan por fases (0–3, 3–6 y 6–12 meses) para avanzar con paso firme.",
+    title: "Descarga y comparte",
+    text: "Un resultado claro por colores y los próximos pasos para avanzar, listo para descargar y compartir.",
   },
 ];
 
+// Color de cada paso (teal · índigo · verde) para el ícono y el realce.
+const STEP_COLORS = ["#0e7490", "#4f46e5", "#16a34a"];
+
 const FEATURES = [
-  "Diagnóstico visual de las 4 dimensiones",
-  "Fortalezas y debilidades priorizadas",
-  "Nivel de madurez: de Incipiente a Líder Digital",
-  "Plan de acción por fases (0–3, 3–6, 6–12 meses)",
-  "Recomendaciones concretas para cada dimensión",
-  "Listo para integrar un chatbot con IA (próximamente)",
+  "Autodiagnóstico visual de las 4 dimensiones",
+  "Tu nivel de madurez por colores: rojo, amarillo o verde",
+  "Tu área más fuerte y la que debes reforzar",
+  "Comparación con el promedio de tu sector",
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -61,22 +62,34 @@ export default function Home() {
             </h2>
           </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {STEPS.map((step, i) => (
+            {STEPS.map((step, i) => {
+              const c = STEP_COLORS[i] ?? "#0e7490";
+              return (
               <Reveal key={step.title} delay={i * 0.1}>
-                <div className="card-hover glass h-full rounded-2xl p-7">
-                  <div className="flex size-12 items-center justify-center rounded-xl bg-primary/12 text-primary">
+                <div className="group card-hover glass relative h-full overflow-hidden rounded-2xl p-7">
+                  {/* top accent in the step color */}
+                  <span aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: c }} />
+                  {/* colored corner glow — hover on desktop, subtle always on mobile */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 max-sm:opacity-60"
+                    style={{ backgroundColor: `${c}33` }}
+                  />
+                  <div
+                    className="relative flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110"
+                    style={{ backgroundColor: `${c}1f`, color: c, boxShadow: `0 6px 16px -8px ${c}` }}
+                  >
                     <step.icon className="size-6" />
                   </div>
-                  <div className="mt-5 flex items-center gap-2">
-                    <span className="font-mono text-sm text-faint">
-                      0{i + 1}
-                    </span>
+                  <div className="relative mt-5 flex items-center gap-2">
+                    <span className="font-mono text-sm text-faint">0{i + 1}</span>
                     <h3 className="text-lg font-semibold">{step.title}</h3>
                   </div>
-                  <p className="mt-2 text-muted">{step.text}</p>
+                  <p className="relative mt-2 text-muted">{step.text}</p>
                 </div>
               </Reveal>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -99,16 +112,26 @@ export default function Home() {
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {DIMENSIONS.map((d, i) => (
                 <Reveal key={d.id} delay={(i % 4) * 0.08}>
-                  <div className="card-hover glass relative h-full overflow-hidden rounded-2xl p-6">
+                  <div className="group card-hover glass relative h-full overflow-hidden rounded-2xl p-6">
                     <span
                       aria-hidden
-                      className="absolute inset-x-0 top-0 h-1"
+                      className="absolute inset-x-0 top-0 h-1 origin-left scale-x-100 transition-transform duration-300"
                       style={{ backgroundColor: d.color }}
                     />
-                    <div className="flex items-center justify-between">
+                    {/* soft corner glow that warms up on hover */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 max-sm:opacity-60"
+                      style={{ backgroundColor: `${d.color}33` }}
+                    />
+                    <div className="relative flex items-center justify-between">
                       <span
-                        className="flex size-11 items-center justify-center rounded-xl"
-                        style={{ backgroundColor: `${d.color}1f`, color: d.color }}
+                        className="flex size-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110"
+                        style={{
+                          backgroundColor: `${d.color}1f`,
+                          color: d.color,
+                          boxShadow: `0 6px 16px -8px ${d.color}`,
+                        }}
                       >
                         <DimensionIcon name={d.icon} className="size-5" />
                       </span>
@@ -116,8 +139,8 @@ export default function Home() {
                         Área {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
-                    <h3 className="mt-4 font-semibold">{d.title}</h3>
-                    <p className="mt-1.5 text-sm text-muted">{d.description}</p>
+                    <h3 className="relative mt-4 font-semibold">{d.title}</h3>
+                    <p className="relative mt-1.5 text-sm text-muted">{d.description}</p>
                   </div>
                 </Reveal>
               ))}
@@ -133,13 +156,13 @@ export default function Home() {
           <div className="grid items-center gap-12 md:grid-cols-2">
             <Reveal>
               <div className="glass glow-accent flex items-center justify-center rounded-3xl p-10">
-                <Semaforo score={6.5} size="lg" />
+                <SemaforoCycle size="xl" />
               </div>
             </Reveal>
             <Reveal delay={0.1}>
               <Eyebrow>Qué obtienes</Eyebrow>
               <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                Un diagnóstico que se convierte en acción
+                Un autodiagnóstico que se convierte en acción
               </h2>
               <p className="mt-4 text-muted">
                 No solo un puntaje: una lectura clara de dónde estás y qué hacer a
@@ -172,17 +195,18 @@ export default function Home() {
               <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
               <div className="relative">
                 <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
-                  Descubre la madurez digital de tu empresa hoy
+                  Haz el autodiagnóstico digital de tu empresa hoy
                 </h2>
                 <p className="mx-auto mt-4 max-w-xl text-muted">
                   Gratis, sin registro y con resultado inmediato. Comparte el
-                  enlace y mide a todo tu equipo o tus aliados.
+                  enlace y que todo tu equipo o tus aliados midan su semáforo
+                  digital.
                 </p>
                 <Link
                   href="/diagnostico"
                   className={buttonClasses("primary", "lg", "mt-8")}
                 >
-                  Iniciar diagnóstico <ArrowRight className="size-5" />
+                  Iniciar autodiagnóstico <ArrowRight className="size-5" />
                 </Link>
               </div>
             </div>

@@ -30,14 +30,14 @@ export function Logo({
         stroke="#475569"
         strokeWidth="0.8"
       />
-      {/* lamps */}
-      <circle cx="24" cy="13" r="6.2" fill="#ef4444" />
-      <circle cx="24" cy="24" r="6.2" fill="#f59e0b" />
-      <circle cx="24" cy="35" r="6.2" fill="#22c55e" />
+      {/* lamps — slightly smaller so they don't crowd the housing */}
+      <circle cx="24" cy="12.8" r="5" fill="#ef4444" />
+      <circle cx="24" cy="24" r="5" fill="#f59e0b" />
+      <circle cx="24" cy="35.2" r="5" fill="#22c55e" />
       {/* gloss highlights */}
-      <circle cx="21.8" cy="10.9" r="1.9" fill="#ffffff" opacity="0.55" />
-      <circle cx="21.8" cy="21.9" r="1.9" fill="#ffffff" opacity="0.5" />
-      <circle cx="21.8" cy="32.9" r="1.9" fill="#ffffff" opacity="0.5" />
+      <circle cx="22.3" cy="11.1" r="1.5" fill="#ffffff" opacity="0.55" />
+      <circle cx="22.3" cy="22.3" r="1.5" fill="#ffffff" opacity="0.5" />
+      <circle cx="22.3" cy="33.5" r="1.5" fill="#ffffff" opacity="0.5" />
     </svg>
   );
 }

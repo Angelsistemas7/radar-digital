@@ -11,7 +11,7 @@ export function SiteFooter() {
           de 2012 (Habeas Data).
           <br className="hidden sm:block" />
           <span className="text-muted">
-            © {new Date().getFullYear()} Radar Digital.
+            © {new Date().getFullYear()} Semáforo Digital.
           </span>{" "}
           <Link href="/privacidad" className="underline-offset-4 hover:text-muted hover:underline">
             Privacidad

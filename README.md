@@ -1,9 +1,9 @@
 # 🚦 Semáforo Digital
 
-**Diagnóstico de Madurez Digital para empresas.** Un cuestionario web que mide la
+**Autodiagnóstico de Madurez Digital para empresas.** Un cuestionario web que mide la
 madurez digital en **4 dimensiones** y entrega un **semáforo digital** (resultado
-**cualitativo por colores, sin notas numéricas**), un **diagnóstico** y un **PDF**
-descargable. Incluye un **panel administrador** con gráficas y exportación de datos.
+**cualitativo por colores, sin notas numéricas**) y un **diagnóstico**. Incluye un
+**panel administrador** con gráficas y exportación de datos.
 
 > Construido con Next.js 16 (App Router), React 19, TypeScript, Tailwind v4,
 > Motion, Recharts y Supabase.
@@ -18,12 +18,18 @@ descargable. Incluye un **panel administrador** con gráficas y exportación de 
 
 - **Onboarding** con validación en vivo (Zod + react-hook-form) y **filtro anti-basura**
   (rechaza textos como `asasas`, correos temporales, teléfonos inválidos) + honeypot anti-bots.
+  Incluye un **semáforo de estado** (ámbar por defecto → rojo si hay errores → verde si
+  todo es válido) y **aura roja** alrededor de los campos inválidos.
 - **Cuestionario animado** sección por sección, respuesta con **semáforo**
-  (🔴 No · 🟡 Más o menos · 🟢 Sí), barra de progreso y **autoguardado**
-  (se puede retomar si se cierra la página).
+  (🔴 No · 🟡 Más o menos · 🟢 Sí), barra de progreso, **autoguardado** (se puede
+  retomar si se cierra la página) y un **aura de color** que tiñe cada pregunta según
+  la respuesta.
 - **Resultado cualitativo (sin números)**: un **semáforo grande** con la luz del
-  estado encendida y las **4 áreas** coloreadas según su estado, más 4 indicadores
-  cualitativos, diagnóstico y descarga del **PDF "semáforo digital"**.
+  estado encendida (color **fuerte**, no gradual) y las **4 áreas** coloreadas según su
+  estado, más 4 indicadores cualitativos y un diagnóstico. *(El resumen tipo semáforo en
+  PDF existe en el motor; está previsto enviarlo por correo — hoy no hay botón de descarga
+  en pantalla.)*
+- **Tema claro** en todo el sitio (se retiró el modo oscuro).
 - **Diagnóstico por reglas**: el plan de acción por fases (0–3, 3–6, 6–12 meses) se
   conserva en el motor y se incluye en el **PDF** y el **correo de lead**, pero ya
   **no** se muestra en la pantalla de resultados.
@@ -33,8 +39,9 @@ descargable. Incluye un **panel administrador** con gráficas y exportación de 
   rate limiting, sesión de admin firmada (HMAC, cookie httpOnly), RLS en la base de
   datos y consentimiento de datos (Ley 1581 / Habeas Data).
 - **Motor configurable**: dimensiones, preguntas, estados y umbrales viven en
-  `src/lib/`; cambia ahí y el resultado se adapta — **pero ojo con los umbrales
-  duplicados** (ver avisos en [`ARCHITECTURE.md`](./ARCHITECTURE.md)).
+  `src/lib/`; cambia ahí y el resultado se adapta. Los **umbrales del semáforo**
+  (rojo < 3 · amarillo 3–8,9 · verde ≥ 9) están **centralizados** en
+  `src/lib/scoring.ts` (`BAND_EDGES` / `levelIndexForScore`).
 
 ---
 
@@ -130,9 +137,9 @@ públicas: todo el acceso pasa por el servidor con la *service role key*.
 Todo el contenido del test está en
 [`src/lib/questionnaire.ts`](./src/lib/questionnaire.ts):
 
-- Edita o agrega **dimensiones** (cada una es un eje del radar).
+- Edita o agrega **dimensiones** (cada una es un área del semáforo).
 - Cambia **preguntas**, **niveles de madurez** y **recomendaciones** por nivel.
-- El radar, la puntuación y el diagnóstico se ajustan automáticamente.
+- El semáforo, la puntuación y el diagnóstico se ajustan automáticamente.
 
 ---
 
@@ -159,11 +166,17 @@ supabase/schema.sql           # Esquema de la base de datos
 
 ## 🛣️ Próximos pasos
 
+- **Correo de lead**: dejarlo cualitativo (hoy aún muestra puntajes) y enviar el
+  **resumen tipo semáforo en PDF** por correo (sustituye al botón de descarga, que se
+  retiró de la pantalla).
+- **Pulido visual pendiente** (ver el texto de tareas para el equipo):
+  - Latido del semáforo de **resultados** (la luz baja y sube de intensidad cada ~1,5–2 s).
+  - Suavizar el **corte de color** entre el hero y la sección «Cómo funciona» del home.
+  - Ajustar el tamaño del **semáforo del formulario** / el campo «Nombre del emprendimiento».
 - **Asesor con IA**: el componente y el endpoint existen
   (`components/results/ai-advisor.tsx`, `app/api/asesor`) pero **se quitaron de la
   pantalla de resultados**. Decisión pendiente: reconectarlo o borrarlo (ver
   [`ARCHITECTURE.md`](./ARCHITECTURE.md)).
-- Hacer el **correo de lead** también sin números (hoy aún muestra puntajes).
 - Exportación directa a Google Drive / Sheets; benchmarking entre empresas.
 
 ---

@@ -21,50 +21,67 @@ import { Reveal } from "@/components/ui/reveal";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
 import { clearState } from "@/lib/storage";
-import { levelForScore } from "@/lib/scoring";
+import { levelForScore, levelIndexForScore } from "@/lib/scoring";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
-import { cn, scoreColor } from "@/lib/utils";
+import { scoreColor } from "@/lib/utils";
 import type { AssessmentResult, DimensionScore } from "@/lib/types";
 
 /** Color word for a 0-10 score, aligned with the traffic-light bands. */
 function colorWord(score: number): string {
-  if (score < 6.1) return "rojo";
-  if (score < 9.1) return "amarillo";
-  return "verde";
+  return (["rojo", "amarillo", "verde"] as const)[levelIndexForScore(score)];
 }
 
-function dimIcon(dimensionId: string): string {
-  return QUESTIONNAIRE.dimensions.find((x) => x.id === dimensionId)?.icon ?? "";
+function dimMeta(dimensionId: string) {
+  const d = QUESTIONNAIRE.dimensions.find((x) => x.id === dimensionId);
+  return { icon: d?.icon ?? "", description: d?.description ?? "", title: d?.title ?? "" };
 }
 
-/* ---------- per-dimension state row (color = its state) ---------- */
+/* ---------- per-dimension state card (color = its state) ---------- */
 function SectionState({ d, index }: { d: DimensionScore; index: number }) {
   const color = scoreColor(d.score);
   const state = levelForScore(d.score).name;
+  const meta = dimMeta(d.dimensionId);
   return (
     <motion.div
       initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.15 + index * 0.07, duration: 0.4, ease: "easeOut" }}
-      className="flex items-center gap-3 rounded-2xl border border-border/70 bg-surface/40 p-3.5"
+      className="relative overflow-hidden rounded-2xl border bg-card p-4 shadow-sm"
+      style={{ borderColor: `${color}59` }}
     >
+      {/* color accent strip + soft wash for contrast */}
+      <span aria-hidden className="absolute inset-y-0 left-0 w-1.5" style={{ backgroundColor: color }} />
       <span
-        className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-        style={{ backgroundColor: `${color}1f`, color }}
-      >
-        <DimensionIcon name={dimIcon(d.dimensionId)} className="size-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-foreground/90">{d.name}</p>
-        <p className="truncate text-xs font-medium" style={{ color }}>
-          {state}
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `linear-gradient(120deg, ${color}14, transparent 60%)` }}
+      />
+      <div className="relative">
+        <div className="flex items-center gap-2.5">
+          <span
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ backgroundColor: `${color}24`, color }}
+          >
+            <DimensionIcon name={meta.icon} className="size-[18px]" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[15px] font-bold leading-tight text-foreground">
+              {meta.title}
+            </p>
+            <p className="text-xs font-semibold" style={{ color }}>
+              {state}
+            </p>
+          </div>
+          <span
+            className="size-3 shrink-0 rounded-full"
+            style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
+            aria-hidden
+          />
+        </div>
+        <p className="mt-2 line-clamp-2 text-xs leading-snug text-muted">
+          {meta.description}
         </p>
       </div>
-      <span
-        className="size-3 shrink-0 rounded-full"
-        style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
-        aria-hidden
-      />
     </motion.div>
   );
 }
@@ -83,25 +100,25 @@ function Widget({
   color: string;
 }) {
   return (
-    <div className="glass card-hover rounded-2xl p-4">
-      <div className="flex items-center gap-2">
+    <div className="glass card-hover rounded-2xl p-3.5 sm:p-4">
+      <div className="flex items-start gap-2">
         <span
           className="flex size-7 shrink-0 items-center justify-center rounded-lg"
           style={{ backgroundColor: `${color}1f`, color }}
         >
           <Icon className="size-4" />
         </span>
-        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-faint">
+        <p className="text-[10px] font-semibold uppercase leading-tight tracking-[0.1em] text-faint sm:text-[11px] sm:tracking-[0.12em]">
           {label}
         </p>
       </div>
       <p
-        className="mt-2.5 truncate font-display text-lg font-bold leading-tight"
+        className="mt-2.5 font-display text-base font-bold leading-tight sm:text-lg"
         style={{ color }}
       >
         {value}
       </p>
-      {sub && <p className="mt-0.5 truncate text-xs text-muted">{sub}</p>}
+      {sub && <p className="mt-0.5 text-xs leading-snug text-muted">{sub}</p>}
     </div>
   );
 }
@@ -174,7 +191,7 @@ export function ResultView({
       {/* print-only report header */}
       <div className="mb-6 hidden print:block">
         <div className="flex items-center justify-between border-b border-[#d9dee8] pb-3">
-          <span className="font-display text-lg font-bold">Radar Digital</span>
+          <span className="font-display text-lg font-bold">Semáforo Digital</span>
           <span className="text-sm">
             Reporte de Madurez Digital ·{" "}
             {new Date().toLocaleDateString("es-CO", {

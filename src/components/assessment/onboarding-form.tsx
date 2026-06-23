@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef } from "react";
+import { motion } from "motion/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Semaforo, LAMP_COLORS } from "@/components/ui/semaforo";
 import {
   respondentSchema,
   type RespondentInput,
@@ -53,29 +55,53 @@ export function OnboardingForm({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<RespondentInput>({
     resolver: zodResolver(respondentSchema),
     defaultValues: { ...emptyRespondent, ...initial },
     mode: "onTouched",
   });
 
+  // Estado del semáforo: rojo si hay errores, verde si todo válido, ámbar por defecto.
+  const stateIdx: 0 | 1 | 2 =
+    Object.keys(errors).length > 0 ? 0 : isValid ? 2 : 1;
+  const stateColor = LAMP_COLORS[stateIdx];
+  // Wash tenue alrededor del formulario (menos intenso que el del home).
+  const SOFT_WASH = [
+    "rgba(239,68,68,0.16)",
+    "rgba(245,158,11,0.10)",
+    "rgba(34,197,94,0.16)",
+  ] as const;
+
   return (
-    <form
-      noValidate
-      onSubmit={handleSubmit((data) => {
-        if (honeypot.current?.value) return; // bot trap
-        onComplete(data);
-      })}
-      className="glass rounded-3xl p-6 sm:p-8"
-    >
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight">Antes de comenzar</h2>
-        <p className="mt-1.5 text-sm text-muted">
-          Cuéntanos quién realiza el diagnóstico. Usaremos estos datos solo para
-          identificar y entregar tu resultado.
-        </p>
-      </div>
+    <div className="relative">
+      {/* contraste de color alrededor del formulario (fuera del encuadre) */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -inset-6 rounded-[2.5rem] blur-3xl sm:-inset-10"
+        animate={{ backgroundColor: SOFT_WASH[stateIdx] }}
+        transition={{ duration: 0.7, ease: "easeInOut" }}
+      />
+      <form
+        noValidate
+        onSubmit={handleSubmit((data) => {
+          if (honeypot.current?.value) return; // bot trap
+          onComplete(data);
+        })}
+        className="relative glass rounded-3xl p-6 sm:p-8"
+      >
+        {/* semáforo de estado en la esquina superior derecha */}
+        <div className="absolute right-4 top-4 sm:right-5 sm:top-5">
+          <Semaforo active={stateIdx} color={stateColor} size="sm" />
+        </div>
+
+        <div className="mb-6 pr-[76px] sm:pr-24">
+          <h2 className="text-2xl font-bold tracking-tight">Antes de comenzar</h2>
+          <p className="mt-1.5 text-sm text-muted">
+            Cuéntanos quién realiza el diagnóstico. Usaremos estos datos solo para
+            identificar y entregar tu resultado.
+          </p>
+        </div>
 
       {/* honeypot (hidden from users, catches bots) */}
       <input
@@ -97,7 +123,7 @@ export function OnboardingForm({
           <input
             {...register("company")}
             placeholder="Ej. Innova Café S.A.S."
-            className={cn(inputCls, errors.company ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.company ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           />
           <FieldError msg={errors.company?.message} />
         </div>
@@ -110,7 +136,7 @@ export function OnboardingForm({
           <input
             {...register("fullName")}
             placeholder="Nombres y apellidos"
-            className={cn(inputCls, errors.fullName ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.fullName ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           />
           <FieldError msg={errors.fullName?.message} />
         </div>
@@ -123,7 +149,7 @@ export function OnboardingForm({
           <input
             {...register("role")}
             placeholder="Ej. Fundador / Gerente"
-            className={cn(inputCls, errors.role ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.role ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           />
           <FieldError msg={errors.role?.message} />
         </div>
@@ -138,7 +164,7 @@ export function OnboardingForm({
             type="email"
             inputMode="email"
             placeholder="nombre@empresa.com"
-            className={cn(inputCls, errors.email ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.email ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           />
           <FieldError msg={errors.email?.message} />
         </div>
@@ -153,7 +179,7 @@ export function OnboardingForm({
             type="tel"
             inputMode="tel"
             placeholder="300 123 4567"
-            className={cn(inputCls, errors.phone ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.phone ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           />
           <FieldError msg={errors.phone?.message} />
         </div>
@@ -166,7 +192,7 @@ export function OnboardingForm({
           <input
             {...register("city")}
             placeholder="Ej. Bogotá"
-            className={cn(inputCls, errors.city ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.city ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           />
           <FieldError msg={errors.city?.message} />
         </div>
@@ -178,7 +204,7 @@ export function OnboardingForm({
           </label>
           <select
             {...register("country")}
-            className={cn(inputCls, errors.country ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.country ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           >
             {COUNTRIES.map((c) => (
               <option key={c} value={c} className="bg-surface text-foreground">
@@ -196,7 +222,7 @@ export function OnboardingForm({
           </label>
           <select
             {...register("sector")}
-            className={cn(inputCls, errors.sector ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.sector ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           >
             <option value="" disabled>
               Selecciona tu sector…
@@ -222,7 +248,7 @@ export function OnboardingForm({
           </label>
           <select
             {...register("educationLevel")}
-            className={cn(inputCls, errors.educationLevel ? "border-danger" : "border-border")}
+            className={cn(inputCls, errors.educationLevel ? "border-danger ring-2 ring-danger/30 shadow-[0_0_0_4px_rgba(220,38,38,0.10)]" : "border-border")}
           >
             <option value="" disabled>
               Selecciona tu nivel educativo…
@@ -290,6 +316,7 @@ export function OnboardingForm({
           Comenzar el diagnóstico <ArrowRight className="size-5" />
         </button>
       </div>
-    </form>
+      </form>
+    </div>
   );
 }

@@ -2,21 +2,35 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, Clock, Sparkles, BadgeCheck } from "lucide-react";
+import { ArrowRight, Clock, BadgeCheck, ShieldCheck } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
-import { Semaforo } from "@/components/ui/semaforo";
-import { levelForScore } from "@/lib/scoring";
-
-const SAMPLE_SCORE = 6.5;
-const SAMPLE_LEVEL = levelForScore(SAMPLE_SCORE);
+import { Semaforo, useSemaforoCycle, WASH } from "@/components/ui/semaforo";
+import { QUESTIONNAIRE } from "@/lib/questionnaire";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function Hero() {
+  const { index, color } = useSemaforoCycle();
+  const level = QUESTIONNAIRE.maturityLevels[index];
+
   return (
     <section className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-grid" />
       <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
+
+      {/* ambient color wash — gently follows the semáforo's current color */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute right-[6%] top-[8%] size-[36rem] rounded-full blur-3xl"
+          animate={{ backgroundColor: WASH[index] }}
+          transition={{ duration: 1.4, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 left-[-10%] size-[34rem] rounded-full blur-3xl"
+          animate={{ backgroundColor: WASH[index] }}
+          transition={{ duration: 1.4, ease: "easeInOut" }}
+        />
+      </div>
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-24 pt-16 md:grid-cols-2 md:pt-24">
         <div>
@@ -30,7 +44,7 @@ export function Hero() {
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/60" />
               <span className="relative inline-flex size-2 rounded-full bg-primary" />
             </span>
-            Diagnóstico gratuito · 4 áreas
+            Autodiagnóstico gratuito · 4 áreas
           </motion.span>
 
           <motion.h1
@@ -56,9 +70,9 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.12, ease: EASE }}
             className="mt-6 max-w-md text-lg leading-relaxed text-muted"
           >
-            Responde con un semáforo —sí, más o menos o no— y obtén al instante
-            tu semáforo digital con tus fortalezas, tus áreas de mejora y un
-            plan de acción concreto para tu transformación digital.
+            Responde con un semáforo —sí, más o menos o no— y al instante conoce
+            el nivel de madurez digital de tu empresa, área por área, con la
+            claridad de un semáforo.
           </motion.p>
 
           <motion.div
@@ -68,7 +82,7 @@ export function Hero() {
             className="mt-8 flex flex-wrap items-center gap-3"
           >
             <Link href="/diagnostico" className={buttonClasses("primary", "lg")}>
-              Iniciar diagnóstico <ArrowRight className="size-5" />
+              Iniciar autodiagnóstico <ArrowRight className="size-5" />
             </Link>
             <a href="#dimensiones" className={buttonClasses("secondary", "lg")}>
               Ver dimensiones
@@ -88,20 +102,24 @@ export function Hero() {
               <BadgeCheck className="size-4 text-primary" /> Resultado inmediato
             </li>
             <li className="inline-flex items-center gap-1.5">
-              <Sparkles className="size-4 text-primary" /> Plan personalizado
+              <ShieldCheck className="size-4 text-primary" /> Sin registro
             </li>
           </motion.ul>
         </div>
 
-        {/* Semáforo visual */}
+        {/* Semáforo visual — anima de rojo a amarillo a verde */}
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
           className="relative mx-auto w-full max-w-md"
         >
-          <div className="pointer-events-none absolute -inset-8 rounded-[2.5rem] bg-primary/10 blur-3xl" />
-          <div className="glass glow-primary relative rounded-3xl p-6">
+          <motion.div
+            className="pointer-events-none absolute -inset-8 rounded-[2.5rem] blur-3xl"
+            animate={{ backgroundColor: WASH[index] }}
+            transition={{ duration: 1.4, ease: "easeInOut" }}
+          />
+          <div className="glass glow-primary relative rounded-3xl p-6 sm:p-8">
             <div className="mb-6 flex items-center justify-between">
               <p className="text-sm font-semibold text-foreground">
                 Tu semáforo digital
@@ -110,27 +128,29 @@ export function Hero() {
                 Ejemplo
               </span>
             </div>
-            <div className="flex justify-center py-4">
-              <Semaforo score={SAMPLE_SCORE} size="lg" />
+            <div className="flex justify-center py-3 sm:py-4">
+              <Semaforo active={index} color={color} size="xl" />
             </div>
-            <p
-              className="mt-6 text-center text-lg font-bold"
-              style={{ color: SAMPLE_LEVEL.color }}
+            <motion.p
+              className="mt-6 text-center text-lg font-bold transition-colors"
+              animate={{ color }}
+              transition={{ duration: 0.8 }}
             >
-              Nivel {SAMPLE_LEVEL.name}
-            </p>
-            <p className="text-center text-sm text-muted">{SAMPLE_LEVEL.tagline}</p>
+              Nivel {level.name}
+            </motion.p>
+            <p className="text-center text-sm text-muted">{level.tagline}</p>
           </div>
 
-          {/* floating level pill */}
+          {/* floating level pill — reflects the live state */}
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.65, ease: EASE }}
             className="absolute -right-3 -top-3 hidden items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-lg sm:flex"
-            style={{ color: SAMPLE_LEVEL.color }}
           >
-            <BadgeCheck className="size-3.5" /> Nivel {SAMPLE_LEVEL.name}
+            <motion.span animate={{ color }} transition={{ duration: 0.8 }} className="inline-flex items-center gap-1.5">
+              <BadgeCheck className="size-3.5" /> Nivel {level.name}
+            </motion.span>
           </motion.div>
         </motion.div>
       </div>

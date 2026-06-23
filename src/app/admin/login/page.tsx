@@ -25,7 +25,7 @@ export default async function AdminLoginPage({
         <AdminLoginForm next={next} />
       </div>
       <p className="relative mt-6 text-xs text-faint">
-        Acceso restringido · Radar Digital
+        Acceso restringido · Semáforo Digital
       </p>
     </main>
   );

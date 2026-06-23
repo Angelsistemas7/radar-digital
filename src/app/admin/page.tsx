@@ -16,7 +16,6 @@ import {
 import { LogoLockup } from "@/components/ui/logo";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { AdminAutoLogout } from "@/components/admin/auto-logout";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Semaforo } from "@/components/ui/semaforo";
 import {
   LevelDistributionChart,
@@ -92,7 +91,7 @@ export default async function AdminPage() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <Link href="/" aria-label="Radar Digital — inicio">
+            <Link href="/" aria-label="Semáforo Digital — inicio">
               <LogoLockup />
             </Link>
             <span className="hidden rounded-full bg-elevated px-2.5 py-1 text-xs text-muted sm:inline">
@@ -100,7 +99,6 @@ export default async function AdminPage() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Link
               href="/"
               className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:flex"

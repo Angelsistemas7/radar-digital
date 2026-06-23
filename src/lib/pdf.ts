@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import { generateDiagnosis } from "./diagnosis";
 import { QUESTIONNAIRE } from "./questionnaire";
-import { levelForScore } from "./scoring";
+import { levelForScore, levelIndexForScore } from "./scoring";
 import { scoreColor } from "./utils";
 import type { AssessmentResult } from "./types";
 
@@ -62,7 +62,7 @@ const LAMP_BASE: RGB[] = [
 ];
 
 /** Traffic-light lamp index for a 0-10 score (0 red, 1 amber, 2 green). */
-const lampIndex = (score: number) => (score < 6.1 ? 0 : score < 9.1 ? 1 : 2);
+const lampIndex = (score: number) => levelIndexForScore(score);
 
 export function downloadReport(
   result: AssessmentResult,

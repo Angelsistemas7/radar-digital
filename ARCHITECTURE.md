@@ -33,14 +33,18 @@ Supabase (Postgres + RLS) · Resend (correos) · IA multi-proveedor
   ⚠️ Estos cortes están **duplicados en 3 archivos** (ver «Riesgos»).
 
 ## Colores / semáforo
-- `responseOptions` → respuesta por pregunta (0/5/10).
-- `src/lib/utils.ts → scoreColor(score)` → color **gradual** rojo→amarillo→verde
-  para un puntaje 0–10 (paradas en **0 → 6 → 9 → 10**, `COLOR_STOPS`). Lo usan el
-  semáforo grande y los indicadores por área.
-- `src/lib/scoring.ts → levelForScore()` → estado (Inicial/En desarrollo/
-  Consolidado) según las bandas; `bandForScore()` (**<6,1 low, <9,1 medium, ≥9,1 high**)
-  elige las recomendaciones. Mantén estos cortes alineados con `maturityLevels` y con
-  las paradas de `scoreColor` (ver «Riesgos»).
+- `responseOptions` → respuesta por pregunta (0/5/10): rojo=0, amarillo=5, verde=10.
+- **Bandas centralizadas** en `src/lib/scoring.ts`:
+  - `BAND_EDGES = { redMax: 3, amberMax: 9 }` — **fuente única de los cortes**.
+  - `levelIndexForScore(score)` → 0 rojo · 1 amarillo · 2 verde (la luz encendida).
+  - `levelForScore(score)` → estado = `maturityLevels[index]`.
+  - Cortes: **rojo < 3 · amarillo 3–8,9 · verde ≥ 9**. Calibrados por el usuario: con
+    respuestas 0/5/10 (mismo peso) el promedio salta de a poco, así que **rojo solo con
+    varios "no"**, **verde exigente** (7 verdes + 1 amarilla = 9,4 → verde; 6 → amarillo),
+    y amarillo es el centro amplio. `maturityLevels[].range` los refleja.
+- `src/lib/utils.ts → scoreColor(score)` → color **SÓLIDO** (ya no gradual): rojo
+  `#ef4444`, ámbar `#f59e0b`, verde `#22c55e`. Lo usan el semáforo, las áreas y el PDF.
+- `bandForScore()` (recomendaciones del PDF/correo): **<3 low, <9 medium, ≥9 high**.
 
 ## Flujo de una evaluación
 1. **Onboarding** (`components/assessment/onboarding-form.tsx`): datos de la
@@ -94,8 +98,39 @@ src/
   proxy.ts                Middleware (cabeceras de seguridad, guard admin)
 ```
 
-## 🔄 Cambios recientes (rediseño cualitativo)
-Resumen para no auditar a ciegas. Qué cambió en esta iteración y dónde:
+## 🔄 Cambios recientes (pase visual + fix de bandas, 2026-06-23)
+Sobre la versión de los compañeros (rebrand a Semáforo Digital, `semaforo.tsx`,
+nivel educativo, Postgres/Sheets). Qué cambió en este pase y dónde:
+
+- **Fix de bandas** (definidas por el usuario, 2 iteraciones): **rojo <3 · amarillo
+  3–8,9 · verde ≥9** centralizados en `scoring.ts` (`BAND_EDGES`, `levelIndexForScore`).
+  Verde exigente, rojo solo con varios "no". Ver «Colores / semáforo».
+- **Onboarding** (`onboarding-form.tsx`): semáforo de **estado** en la esquina sup. der.
+  (ámbar por defecto · rojo si hay errores · verde si todo válido, vía `formState`) +
+  wash tenue alrededor del formulario que sigue ese color. Campos inválidos con aura roja.
+- **Cuestionario** (`questionnaire.tsx`): scroll a la siguiente pregunta con
+  `animatedScrollTo` (easeInOutCubic, ~900 ms) para que sea más suave.
+- **`scoreColor` ahora es SÓLIDO** (rojo/ámbar/verde fuertes), ya no gradual. Resultados,
+  áreas y PDF muestran color fuerte.
+- **`components/ui/semaforo.tsx` reescrito**: aspecto **3D** (gradientes, glow, brillo),
+  tamaño `xl`, hook `useSemaforoCycle()` + `SemaforoCycle` (cicla rojo→amarillo→verde)
+  y `AmbientWash` (blobs que tiñen el fondo del color actual).
+- **Home** (`hero.tsx`, `page.tsx`): semáforo animado + wash en hero y en "Qué obtienes";
+  copy a **autodiagnóstico**; features recortadas (sin chatbot/recos/plan por fases);
+  CTA y subtítulos ajustados; widgets de "Cómo funciona" y "4 dimensiones" con micro-
+  interacciones (hover lift, glow, watermark). Logo con luces más pequeñas.
+- **Resultados** (`result-view.tsx`): tarjetas de dimensión con más contraste +
+  descripción de 2 renglones; widgets con etiquetas a 2 líneas (móvil); print header
+  «Semáforo Digital».
+- **Onboarding** (`assessment-flow.tsx`): `AmbientWash` detrás del formulario.
+- **Cuestionario** (`questionnaire.tsx`): aura sutil (barra + fondo) del color de la
+  respuesta al contestar; liviano (solo box-shadow/bg, sin blur).
+- **Modo oscuro neón desactivado** en las cabeceras públicas (se quitó `ThemeToggle` de
+  `site-header` y `diagnostico`); el CSS `.dark` sigue ahí. Admin conserva su toggle.
+- **Rebrand restante**: footer ©, headers de admin/login → «Semáforo Digital».
+
+## 🔄 Cambios anteriores (rediseño cualitativo)
+Resumen para no auditar a ciegas. Qué cambió en esa iteración y dónde:
 
 - **Umbrales de estado** (`scoring.ts`, `questionnaire.ts`, `utils.ts`):
   rojo **0–6**, amarillo **6,1–9**, verde **9,1–10** (antes 0–5 / 5–9 / 9–10).
@@ -113,11 +148,11 @@ Resumen para no auditar a ciegas. Qué cambió en esta iteración y dónde:
 - **Diagnóstico** (`lib/diagnosis.ts`): el resumen ya no incluye cifras.
 
 ## ⚠️ Riesgos y puntos a vigilar (qué se puede dañar)
-1. **Umbrales duplicados en 3 sitios.** Si cambias las bandas, edítalas en los TRES o
-   quedan inconsistentes: `questionnaire.ts → maturityLevels[].range`,
-   `scoring.ts → bandForScore()` y `utils.ts → COLOR_STOPS` (parada de `scoreColor`).
-   Los cortes 6,1 / 9,1 **asumen puntajes redondeados a 1 decimal** (`round1`): no
-   uses 6,05 ni medios puntos como frontera.
+1. **Umbrales ya casi centralizados.** La verdad vive en `scoring.ts → BAND_EDGES`
+   (`levelIndexForScore`/`levelForScore`). Aún hay que mantener a mano los espejos:
+   `questionnaire.ts → maturityLevels[].range` (mismos cortes 2,5 / 8) y los hex de
+   `utils.ts → scoreColor`. Los cortes **asumen `round1`** (1 decimal): con respuestas
+   0/5/10 no caen promedios justo en 2,5/8, así que no hay empates de frontera.
 2. **El semáforo del PDF es una copia a mano** del de pantalla (`BigTrafficLight` en
    `result-view.tsx` vs. el dibujo jsPDF en `pdf.ts`). **No se sincronizan solos**: si
    cambias colores/forma/tamaño en uno, hay que replicarlo en el otro.
