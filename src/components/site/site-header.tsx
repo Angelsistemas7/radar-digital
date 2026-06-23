@@ -8,7 +8,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-        <Link href="/" aria-label="Radar Digital — inicio">
+        <Link href="/" aria-label="Semáforo Digital — inicio">
           <LogoLockup />
         </Link>
 

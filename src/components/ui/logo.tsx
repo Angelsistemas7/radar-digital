@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Radar Digital brand mark — concentric radar with a sweep and a blip. */
+/** Semáforo Digital brand mark — a traffic light with red/amber/green lamps. */
 export function Logo({
   size = 36,
   className,
@@ -16,40 +16,28 @@ export function Logo({
       fill="none"
       className={className}
       role="img"
-      aria-label="Radar Digital"
+      aria-label="Semáforo Digital"
     >
-      <defs>
-        <linearGradient
-          id="rdLogo"
-          x1="4"
-          y1="4"
-          x2="44"
-          y2="44"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#0e7490" />
-          <stop offset="1" stopColor="#0891b2" />
-        </linearGradient>
-        <linearGradient
-          id="rdSweep"
-          x1="24"
-          y1="24"
-          x2="38"
-          y2="10"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#0e7490" stopOpacity="0.45" />
-          <stop offset="1" stopColor="#0e7490" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <circle cx="24" cy="24" r="20" stroke="url(#rdLogo)" strokeOpacity="0.3" strokeWidth="1.4" />
-      <circle cx="24" cy="24" r="13" stroke="url(#rdLogo)" strokeOpacity="0.45" strokeWidth="1.4" />
-      <circle cx="24" cy="24" r="6" stroke="url(#rdLogo)" strokeOpacity="0.7" strokeWidth="1.4" />
-      <line x1="4" y1="24" x2="44" y2="24" stroke="url(#rdLogo)" strokeOpacity="0.16" strokeWidth="1" />
-      <line x1="24" y1="4" x2="24" y2="44" stroke="url(#rdLogo)" strokeOpacity="0.16" strokeWidth="1" />
-      <path d="M24 24 L24 4 A20 20 0 0 1 41.3 14 Z" fill="url(#rdSweep)" />
-      <line x1="24" y1="24" x2="24" y2="4" stroke="#0e7490" strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="33" cy="15" r="2.6" fill="#0e7490" />
+      {/* housing — dark slate so it reads on both light and dark themes */}
+      <rect x="14" y="2" width="20" height="44" rx="10" fill="#1e293b" />
+      <rect
+        x="14"
+        y="2"
+        width="20"
+        height="44"
+        rx="10"
+        fill="none"
+        stroke="#475569"
+        strokeWidth="0.8"
+      />
+      {/* lamps */}
+      <circle cx="24" cy="13" r="6.2" fill="#ef4444" />
+      <circle cx="24" cy="24" r="6.2" fill="#f59e0b" />
+      <circle cx="24" cy="35" r="6.2" fill="#22c55e" />
+      {/* gloss highlights */}
+      <circle cx="21.8" cy="10.9" r="1.9" fill="#ffffff" opacity="0.55" />
+      <circle cx="21.8" cy="21.9" r="1.9" fill="#ffffff" opacity="0.5" />
+      <circle cx="21.8" cy="32.9" r="1.9" fill="#ffffff" opacity="0.5" />
     </svg>
   );
 }
@@ -60,7 +48,7 @@ export function LogoLockup({ className }: { className?: string }) {
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <Logo size={32} />
       <span className="font-display text-lg font-bold tracking-tight">
-        Radar<span className="text-gradient"> Digital</span>
+        Semáforo<span className="text-gradient"> Digital</span>
       </span>
     </span>
   );
