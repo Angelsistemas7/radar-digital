@@ -10,7 +10,6 @@ export function AdminLoginForm({ next }: { next?: string }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [navigating, setNavigating] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -28,7 +27,6 @@ export function AdminLoginForm({ next }: { next?: string }) {
         setLoading(false);
         return;
       }
-      setNavigating(true);
       router.replace(next && next.startsWith("/") ? next : "/admin");
     } catch {
       setError("Error de conexión");
@@ -67,10 +65,10 @@ export function AdminLoginForm({ next }: { next?: string }) {
 
       <button
         type="submit"
-        disabled={loading || navigating || !password}
+        disabled={loading || !password}
         className={buttonClasses("primary", "md", "mt-6 w-full")}
       >
-        {navigating ? "Cargando panel…" : loading ? "Verificando…" : <>Entrar <LogIn className="size-4" /></>}
+        {loading ? "Verificando…" : <>Entrar <LogIn className="size-4" /></>}
       </button>
     </form>
   );
