@@ -4,6 +4,7 @@ import { QUESTIONNAIRE } from "./questionnaire";
 import { round1 } from "./utils";
 import type { Answers, Respondent } from "./types";
 import { SECTORS } from "./validation";
+import { appendToSheet } from "./sheets";
 
 /** A row as stored in / read from the `submissions` table. */
 export interface SubmissionRow {
@@ -59,6 +60,14 @@ export async function saveSubmission(
     user_agent: meta.userAgent ?? null,
     ip_hash: meta.ipHash ?? null,
   };
+
+  // Google Sheets — fire and forget.
+  void appendToSheet({
+    respondent,
+    overall: result.overall,
+    levelName: result.level.name,
+    dimensions: result.dimensions.map((d) => ({ name: d.name, score: d.score })),
+  }).catch(() => {});
 
   // Outbound webhook (n8n / Make / Zapier) — fire and forget.
   // Lets you push each submission to Google Sheets/Drive, email or a CRM
