@@ -4,8 +4,10 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight, Clock, BadgeCheck, ShieldCheck } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
+import { ShineOverlay } from "@/components/ui/shine";
 import { Semaforo, useSemaforoCycle, WASH } from "@/components/ui/semaforo";
 import { QUESTIONNAIRE } from "@/lib/questionnaire";
+import { cn } from "@/lib/utils";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -51,7 +53,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05, ease: EASE }}
-            className="mt-5 text-pretty text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl lg:text-[4.25rem]"
+            className="relative mt-5 overflow-hidden text-pretty text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl lg:text-[4.25rem]"
           >
             Mide la{" "}
             <span className="relative inline-block">
@@ -62,6 +64,7 @@ export function Hero() {
               />
             </span>{" "}
             de tu empresa
+            <ShineOverlay delay={5} />
           </motion.h1>
 
           <motion.p
@@ -81,8 +84,9 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.18, ease: EASE }}
             className="mt-8 flex flex-wrap items-center gap-3"
           >
-            <Link href="/diagnostico" className={buttonClasses("primary", "lg")}>
+            <Link href="/diagnostico" className={cn(buttonClasses("primary", "lg"), "relative overflow-hidden")}>
               Iniciar autodiagnóstico <ArrowRight className="size-5" />
+              <ShineOverlay delay={3} />
             </Link>
             <a href="#dimensiones" className={buttonClasses("secondary", "lg")}>
               Ver dimensiones

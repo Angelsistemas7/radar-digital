@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { levelIndexForScore } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
@@ -58,8 +58,8 @@ function Lamp({
               boxShadow: `0 0 ${glow}px ${Math.round(glow / 6)}px ${color}, 0 0 ${Math.round(glow * 1.8)}px ${Math.round(glow / 4)}px ${color}66, inset 0 2px 6px rgba(255,255,255,0.55), inset 0 -4px 10px rgba(0,0,0,0.35)`,
             }
           : {
-              background: `radial-gradient(circle at 36% 30%, ${color}2e, ${color}14 60%, rgba(0,0,0,0.5) 100%)`,
-              boxShadow: "inset 0 2px 6px rgba(0,0,0,0.6), inset 0 -1px 2px rgba(255,255,255,0.05)",
+              background: "radial-gradient(circle at 36% 30%, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 60%, rgba(0,0,0,0.45) 100%)",
+              boxShadow: "inset 0 2px 6px rgba(0,0,0,0.65), inset 0 -1px 2px rgba(255,255,255,0.04)",
             }
       }
     >
@@ -73,13 +73,16 @@ function Lamp({
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
-      {/* pulse overlay — dims and re-lights the lamp body itself */}
+      {/* pulse overlay — expande el color hacia afuera sin oscurecer la lámpara */}
       {lit && pulse && (
         <motion.span
           aria-hidden
-          className="absolute inset-0 rounded-full bg-black"
-          animate={{ opacity: [0, 0.38, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: `radial-gradient(circle at center, ${color} 0%, transparent 75%)`,
+          }}
+          animate={{ opacity: [0, 0.45, 0] }}
+          transition={{ duration: 2.0, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.3 }}
         />
       )}
       {/* specular highlight */}
@@ -180,6 +183,37 @@ export function SemaforoCycle({
 }) {
   const { index, color } = useSemaforoCycle(intervalMs);
   return <Semaforo active={index} color={color} size={size} className={className} />;
+}
+
+/**
+ * Wrapper de sección con dos blobs difuminados que siguen el color del semáforo.
+ * Úsalo en secciones del home para que el color del hero "sangre" hacia abajo.
+ */
+export function AmbientSection({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const { index } = useSemaforoCycle(2200);
+  return (
+    <div className={cn("relative", className)}>
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute right-[2%] top-[-5rem] size-[46rem] rounded-full blur-[90px]"
+        animate={{ backgroundColor: WASH[index] }}
+        transition={{ duration: 1.6, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute bottom-[-5rem] left-[2%] size-[46rem] rounded-full blur-[90px]"
+        animate={{ backgroundColor: WASH[index] }}
+        transition={{ duration: 1.6, ease: "easeInOut" }}
+      />
+      {children}
+    </div>
+  );
 }
 
 /** Fondo ambiental con dos blobs que se tiñen del color del semáforo. */

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { LogoLockup } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
+import { ShineOverlay } from "@/components/ui/shine";
+import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 
 export function SiteHeader() {
@@ -30,9 +32,10 @@ export function SiteHeader() {
           >
             Admin
           </Link>
-          <Link href="/diagnostico" className={buttonClasses("primary", "sm")}>
-            Iniciar diagnóstico
+          <Link href="/diagnostico" className={cn(buttonClasses("primary", "sm"), "relative overflow-hidden")}>
+            Iniciar autodiagnóstico
             <ArrowRight className="size-4" />
+            <ShineOverlay delay={4.5} />
           </Link>
         </div>
       </div>

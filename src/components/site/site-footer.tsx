@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm text-faint sm:flex-row">
         <LogoLockup />
         <p className="text-center sm:text-right">
-          Diagnóstico de madurez digital · Datos tratados conforme a la Ley 1581
+          Autodiagnóstico de madurez digital · Datos tratados conforme a la Ley 1581
           de 2012 (Habeas Data).
           <br className="hidden sm:block" />
           <span className="text-muted">
