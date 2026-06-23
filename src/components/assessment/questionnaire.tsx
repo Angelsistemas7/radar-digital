@@ -108,7 +108,7 @@ export function Questionnaire({
         <div className="flex items-end justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-faint">
-              Diagnóstico de madurez
+              Autodiagnóstico de madurez
             </p>
             <p className="mt-1 truncate text-sm text-muted">
               Dimensión{" "}
