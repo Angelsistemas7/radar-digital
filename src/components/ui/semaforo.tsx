@@ -16,12 +16,13 @@ export const WASH = [
 ] as const;
 export type LampIndex = 0 | 1 | 2;
 
-type Size = "sm" | "md" | "lg" | "xl";
+type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
 const DIMS: Record<
   Size,
   { wrapper: string; lamp: string; gap: string; glow: number }
 > = {
+  xs: { wrapper: "w-[48px] rounded-[1rem] p-2", lamp: "size-[26px]", gap: "gap-1.5", glow: 14 },
   sm: { wrapper: "w-[68px] rounded-[1.3rem] p-2.5", lamp: "size-[36px]", gap: "gap-2.5", glow: 22 },
   md: { wrapper: "w-[92px] rounded-[1.7rem] p-3.5", lamp: "size-[52px]", gap: "gap-3", glow: 30 },
   lg: { wrapper: "w-[120px] rounded-[2.1rem] p-5", lamp: "size-[68px]", gap: "gap-4", glow: 38 },
@@ -35,12 +36,14 @@ function Lamp({
   className,
   glow,
   index,
+  pulse,
 }: {
   color: string;
   lit: boolean;
   className?: string;
   glow: number;
   index: number;
+  pulse?: boolean;
 }) {
   return (
     <motion.span
@@ -70,6 +73,15 @@ function Lamp({
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
+      {/* pulse overlay — dims and re-lights the lamp body itself */}
+      {lit && pulse && (
+        <motion.span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-black"
+          animate={{ opacity: [0, 0.38, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
       {/* specular highlight */}
       {lit && (
         <span
@@ -90,12 +102,14 @@ export function Semaforo({
   active,
   color,
   size = "lg",
+  pulse = false,
   className,
 }: {
   score?: number;
   active?: LampIndex;
   color?: string;
   size?: Size;
+  pulse?: boolean;
   className?: string;
 }) {
   const lit = active ?? (typeof score === "number" ? levelIndexForScore(score) : 1);
@@ -130,6 +144,7 @@ export function Semaforo({
           lit={i === lit}
           className={dims.lamp}
           glow={dims.glow}
+          pulse={pulse}
         />
       ))}
     </div>

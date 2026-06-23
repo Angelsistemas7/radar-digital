@@ -216,7 +216,7 @@ export function ResultView({
           <div className="relative grid items-center gap-8 lg:grid-cols-[auto_1fr]">
             {/* left: big gradual traffic light + level */}
             <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center lg:flex-col lg:items-center">
-              <Semaforo score={result.overall} />
+              <Semaforo score={result.overall} pulse />
               <div className="text-center sm:text-left lg:max-w-[18rem] lg:text-center">
                 {company && (
                   <p className="text-sm text-muted">

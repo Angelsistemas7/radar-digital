@@ -92,7 +92,7 @@ export function OnboardingForm({
       >
         {/* semáforo de estado en la esquina superior derecha */}
         <div className="absolute right-4 top-4 sm:right-5 sm:top-5">
-          <Semaforo active={stateIdx} color={stateColor} size="sm" />
+          <Semaforo active={stateIdx} color={stateColor} size="xs" />
         </div>
 
         <div className="mb-6 pr-[76px] sm:pr-24">

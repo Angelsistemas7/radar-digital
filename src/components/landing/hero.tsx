@@ -154,6 +154,8 @@ export function Hero() {
           </motion.div>
         </motion.div>
       </div>
+      {/* fade al fondo de la página para suavizar el corte con la sección siguiente */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 }
