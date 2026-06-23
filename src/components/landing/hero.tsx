@@ -36,19 +36,6 @@ export function Hero() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-24 pt-16 md:grid-cols-2 md:pt-24">
         <div>
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="inline-flex items-center gap-2 rounded-full border border-border-strong bg-elevated/60 px-3 py-1.5 text-xs font-medium text-muted"
-          >
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/60" />
-              <span className="relative inline-flex size-2 rounded-full bg-primary" />
-            </span>
-            Autodiagnóstico · 4 áreas
-          </motion.span>
-
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -73,8 +60,8 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.12, ease: EASE }}
             className="mt-6 max-w-md text-lg leading-relaxed text-muted"
           >
-            Al instante conoce el nivel de madurez digital de tu empresa, área
-            por área, con la claridad de un semáforo.
+            Responde con un semáforo y al instante conoce el nivel de madurez
+            digital de tu empresa, área por área, con la claridad de un semáforo.
           </motion.p>
 
           <motion.div
@@ -107,13 +94,10 @@ export function Hero() {
             transition={{ duration: 1.4, ease: "easeInOut" }}
           />
           <div className="glass glow-primary relative rounded-3xl p-6 sm:p-8">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6">
               <p className="text-sm font-semibold text-foreground">
                 Tu semáforo digital
               </p>
-              <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-medium text-primary">
-                Ejemplo
-              </span>
             </div>
             <div className="flex justify-center py-3 sm:py-4">
               <Semaforo active={index} color={color} size="xl" />
