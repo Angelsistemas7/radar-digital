@@ -1,4 +1,4 @@
-# Radar Digital — Arquitectura del proyecto
+# Semáforo Digital — Arquitectura del proyecto
 
 Documento de referencia para entender y modificar el proyecto rápido (también
 para abrir un chat nuevo con contexto y gastar menos tokens). Léelo junto con
@@ -73,7 +73,7 @@ src/
   components/
     landing/hero.tsx
     assessment/           onboarding-form · questionnaire · traffic-light · assessment-flow
-    results/              result-view · radar-chart (SIN USO) · ai-advisor (SIN USO)
+    results/              result-view · ai-advisor (SIN USO)
     admin/                submissions-table · admin-charts · ...
     ui/                   button · logo · theme-toggle · reveal · dimension-icon
   lib/
@@ -125,7 +125,7 @@ Resumen para no auditar a ciegas. Qué cambió en esta iteración y dónde:
    - `components/results/ai-advisor.tsx` + ruta `app/api/asesor` + `lib/ai/advisor.ts`
      (+ deps `@anthropic-ai/sdk`, `@google/genai`, `openai`): el asesor ya no se
      muestra. Si no se reconecta, se pueden borrar para aligerar el bundle.
-   - `components/results/radar-chart.tsx`: el radar se quitó de resultados.
+   - `components/results/semaforo.tsx`: semáforo animado reutilizable (sm/md/lg).
    - `lib/share-card.ts`: la tarjeta PNG se quitó («Compartir imagen»).
 4. **El plan de acción sigue vivo en el motor** (`diagnosis.ts → plan`) aunque no se
    vea en pantalla: lo usan el **PDF** y el **correo de lead** (`notify.ts`). **No
@@ -154,7 +154,7 @@ Resumen para no auditar a ciegas. Qué cambió en esta iteración y dónde:
   `RESEND_API_KEY`, `LEAD_NOTIFY_EMAIL`, y opcional una key de IA.
 - **Local**: `npm install` · `npm run dev` (localhost:3000) · `npm run build`.
   ⚠️ Se añadió la dependencia `qrcode`: corre `npm install` para sincronizar `node_modules`.
-- Atajo local: doble clic en `Iniciar Radar Digital.bat`.
+- Atajo local: doble clic en `Iniciar Semáforo Digital.bat`.
 
 > ⚠️ Coexisten **dos** mecanismos de deploy: GitHub Actions hace `git pull` en el VPS
 > (despliega lo que está en GitHub), mientras `scripts/deploy.sh` hace `rsync` desde tu

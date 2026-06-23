@@ -131,7 +131,7 @@ export function downloadReport(
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  text("Radar Digital", M, 34);
+  text("Semáforo Digital", M, 34);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(180, 190, 210);
@@ -368,7 +368,7 @@ export function downloadReport(
     doc.setFontSize(8);
     tc(MUTED);
     text(
-      `Radar Digital · ${dateStr} · Ley 1581 de 2012 (Habeas Data)`,
+      `Semáforo Digital · ${dateStr} · Ley 1581 de 2012 (Habeas Data)`,
       M,
       H - 20,
     );

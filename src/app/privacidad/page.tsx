@@ -5,10 +5,10 @@ import { SiteFooter } from "@/components/site/site-footer";
 export const metadata: Metadata = {
   title: "Política de Tratamiento de Datos Personales",
   description:
-    "Política de privacidad y tratamiento de datos personales de Radar Digital, conforme a la Ley 1581 de 2012 (Colombia).",
+    "Política de privacidad y tratamiento de datos personales de Semáforo Digital, conforme a la Ley 1581 de 2012 (Colombia).",
 };
 
-const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "privacidad@radardigital.co";
+const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "privacidad@semaforodigital.online";
 
 function H2({ children }: { children: React.ReactNode }) {
   return <h2 className="mt-8 mb-2 text-xl font-bold tracking-tight">{children}</h2>;
@@ -34,7 +34,7 @@ export default function PrivacidadPage() {
 
         <H2>1. Responsable del tratamiento</H2>
         <P>
-          Radar Digital es responsable del tratamiento de los datos personales
+          Semáforo Digital es responsable del tratamiento de los datos personales
           recolectados a través de este sitio. Para cualquier solicitud
           relacionada con tus datos, escríbenos a{" "}
           <a className="text-primary underline" href={`mailto:${CONTACT}`}>

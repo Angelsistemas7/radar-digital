@@ -133,7 +133,7 @@ export async function notifyLeadByEmail(lead: LeadEmailData): Promise<void> {
   if (!apiKey || !to) return;
 
   const from =
-    process.env.LEAD_FROM_EMAIL || "Radar Digital <onboarding@resend.dev>";
+    process.env.LEAD_FROM_EMAIL || "Semáforo Digital <onboarding@resend.dev>";
 
   const lc = levelColor(lead.levelName);
   const score = lead.overall != null ? fmt(lead.overall) : "—";
@@ -167,7 +167,7 @@ export async function notifyLeadByEmail(lead: LeadEmailData): Promise<void> {
     <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
 
       <div style="background:#0b1224;padding:20px 24px">
-        <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7c8cb0">Radar Digital</div>
+        <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7c8cb0">Semáforo Digital</div>
         <div style="font-size:20px;font-weight:700;color:#fff;margin-top:3px">Nuevo interesado en contacto</div>
       </div>
       <div style="height:4px;background:${lc}"></div>
@@ -210,7 +210,7 @@ export async function notifyLeadByEmail(lead: LeadEmailData): Promise<void> {
   </div>`;
 
   const text = [
-    "Nuevo interesado en contacto — Radar Digital",
+    "Nuevo interesado en contacto — Semáforo Digital",
     "",
     `Empresa:  ${lead.company ?? "—"}`,
     `Persona:  ${lead.full_name ?? "—"}`,

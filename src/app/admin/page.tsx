@@ -17,7 +17,7 @@ import { LogoLockup } from "@/components/ui/logo";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { AdminAutoLogout } from "@/components/admin/auto-logout";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { RadarChart } from "@/components/results/radar-chart";
+import { Semaforo } from "@/components/ui/semaforo";
 import {
   LevelDistributionChart,
   TimelineChart,
@@ -85,11 +85,6 @@ export default async function AdminPage() {
   }
 
   const summary = summarize(rows);
-  const radarData = summary.dimensionAverages.map((d) => ({
-    label: d.name,
-    value: d.avg,
-    color: d.color,
-  }));
 
   return (
     <>
@@ -197,12 +192,20 @@ export default async function AdminPage() {
           />
         </div>
 
-        {/* Radar + level distribution */}
+        {/* Semáforos por dimensión + level distribution */}
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="glass rounded-3xl p-6">
-            <h2 className="mb-2 text-lg font-semibold">Madurez promedio por dimensión</h2>
+            <h2 className="mb-4 text-lg font-semibold">Semáforo promedio por dimensión</h2>
             {summary.total > 0 ? (
-              <RadarChart data={radarData} size={360} />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+                {summary.dimensionAverages.map((d) => (
+                  <div key={d.dimensionId} className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 bg-surface/40 p-3">
+                    <Semaforo score={d.avg} size="sm" />
+                    <p className="text-center text-xs font-semibold leading-tight text-foreground/90">{d.name}</p>
+                    <p className="text-xs font-bold tabular-nums" style={{ color: d.color }}>{d.avg.toFixed(1)}</p>
+                  </div>
+                ))}
+              </div>
             ) : (
               <EmptyChart />
             )}

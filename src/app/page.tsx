@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { ClipboardList, Radar, Rocket, ArrowRight, Check } from "lucide-react";
+import { ClipboardList, TrafficCone, Rocket, ArrowRight, Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { Hero } from "@/components/landing/hero";
 import { Reveal } from "@/components/ui/reveal";
 import { DimensionIcon } from "@/components/ui/dimension-icon";
-import { RadarChart } from "@/components/results/radar-chart";
+import { Semaforo } from "@/components/ui/semaforo";
 import { buttonClasses } from "@/components/ui/button";
 import { DIMENSIONS } from "@/lib/questionnaire";
 import { totalQuestions } from "@/lib/scoring";
@@ -17,9 +17,9 @@ const STEPS = [
     text: `${totalQuestions()} preguntas en ${DIMENSIONS.length} dimensiones. Respondes con un semáforo: verde (sí), amarillo (más o menos) o rojo (no). Te toma unos 5 minutos.`,
   },
   {
-    icon: Radar,
-    title: "Visualiza tu radar",
-    text: "Obtén al instante un radar interactivo que revela tus fortalezas y debilidades digitales.",
+    icon: TrafficCone,
+    title: "Tu semáforo digital",
+    text: "Obtén al instante tu semáforo digital que revela tus fortalezas y áreas de mejora.",
   },
   {
     icon: Rocket,
@@ -36,12 +36,6 @@ const FEATURES = [
   "Recomendaciones concretas para cada dimensión",
   "Listo para integrar un chatbot con IA (próximamente)",
 ];
-
-const SAMPLE = DIMENSIONS.map((d, i) => ({
-  label: d.name,
-  color: d.color,
-  value: [7.5, 5, 8.75, 3.75, 6.25, 5, 7.5, 3.75][i] ?? 6,
-}));
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -98,7 +92,7 @@ export default function Home() {
                 Evaluamos tu madurez digital de forma integral
               </h2>
               <p className="mt-4 text-muted">
-                Cada dimensión es un eje de tu radar. Juntas dibujan el mapa
+                Cada dimensión es un área de tu semáforo. Juntas dibujan el mapa
                 completo de la transformación digital de tu empresa.
               </p>
             </Reveal>
@@ -119,7 +113,7 @@ export default function Home() {
                         <DimensionIcon name={d.icon} className="size-5" />
                       </span>
                       <span className="font-mono text-xs text-faint">
-                        Eje {String(i + 1).padStart(2, "0")}
+                        Área {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
                     <h3 className="mt-4 font-semibold">{d.title}</h3>
@@ -138,8 +132,8 @@ export default function Home() {
         >
           <div className="grid items-center gap-12 md:grid-cols-2">
             <Reveal>
-              <div className="glass glow-accent rounded-3xl p-6">
-                <RadarChart data={SAMPLE} showLabels size={360} animate={false} />
+              <div className="glass glow-accent flex items-center justify-center rounded-3xl p-10">
+                <Semaforo score={6.5} size="lg" />
               </div>
             </Reveal>
             <Reveal delay={0.1}>

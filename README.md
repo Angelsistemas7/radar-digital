@@ -1,4 +1,4 @@
-# 🛰️ Radar Digital
+# 🚦 Semáforo Digital
 
 **Diagnóstico de Madurez Digital para empresas.** Un cuestionario web que mide la
 madurez digital en **4 dimensiones** y entrega un **semáforo digital** (resultado

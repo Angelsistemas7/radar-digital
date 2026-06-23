@@ -20,33 +20,33 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://radar-digital-three.vercel.app"),
+  metadataBase: new URL("https://semaforodigital.online"),
   title: {
-    default: "Radar Digital — Diagnóstico de Madurez Digital",
-    template: "%s · Radar Digital",
+    default: "Semáforo Digital — Diagnóstico de Madurez Digital",
+    template: "%s · Semáforo Digital",
   },
   description:
     "Mide la madurez digital de tu empresa en 4 dimensiones y recibe un plan de acción personalizado para impulsar tu transformación digital.",
-  applicationName: "Radar Digital",
+  applicationName: "Semáforo Digital",
   keywords: [
     "madurez digital",
     "transformación digital",
     "diagnóstico empresarial",
-    "Radar Digital",
+    "Semáforo Digital",
   ],
-  authors: [{ name: "Radar Digital" }],
+  authors: [{ name: "Semáforo Digital" }],
   openGraph: {
-    title: "Radar Digital — Diagnóstico de Madurez Digital",
+    title: "Semáforo Digital — Diagnóstico de Madurez Digital",
     description:
       "Descubre las fortalezas y debilidades digitales de tu empresa con un diagnóstico de 4 dimensiones.",
-    siteName: "Radar Digital",
-    url: "https://radar-digital-three.vercel.app",
+    siteName: "Semáforo Digital",
+    url: "https://semaforodigital.online",
     type: "website",
     locale: "es_CO",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Radar Digital — Diagnóstico de Madurez Digital",
+    title: "Semáforo Digital — Diagnóstico de Madurez Digital",
     description:
       "Mide la madurez digital de tu empresa en 4 dimensiones y recibe un plan de acción.",
   },

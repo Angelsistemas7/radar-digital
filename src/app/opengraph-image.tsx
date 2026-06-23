@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Radar Digital — Diagnóstico de Madurez Digital";
+export const alt = "Semáforo Digital — Diagnóstico de Madurez Digital";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -31,10 +31,23 @@ export default function Image() {
             opacity: 0.92,
           }}
         >
+          {/* mini traffic light */}
           <div
-            style={{ width: 20, height: 20, borderRadius: 10, background: "#22d3ee" }}
-          />
-          RADAR DIGITAL
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 4,
+              background: "#0b1220",
+              borderRadius: 12,
+              padding: "8px 6px",
+            }}
+          >
+            <div style={{ width: 12, height: 12, borderRadius: 6, background: "#ef4444" }} />
+            <div style={{ width: 12, height: 12, borderRadius: 6, background: "#f59e0b" }} />
+            <div style={{ width: 12, height: 12, borderRadius: 6, background: "#22c55e", boxShadow: "0 0 8px #22c55e" }} />
+          </div>
+          SEMÁFORO DIGITAL
         </div>
 
         <div

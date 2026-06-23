@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site/site-footer";
 
 export const metadata: Metadata = {
   title: "Términos de uso",
-  description: "Términos y condiciones de uso de Radar Digital.",
+  description: "Términos y condiciones de uso de Semáforo Digital.",
 };
 
 function H2({ children }: { children: React.ReactNode }) {
@@ -28,7 +28,7 @@ export default function TerminosPage() {
 
         <H2>1. Objeto</H2>
         <P>
-          Radar Digital es una herramienta para autoevaluar la madurez digital de
+          Semáforo Digital es una herramienta para autoevaluar la madurez digital de
           un emprendimiento o empresa y obtener un diagnóstico y un plan de acción
           orientativo.
         </P>
