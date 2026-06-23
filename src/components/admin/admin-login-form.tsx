@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { Lock, AlertCircle, LogIn } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 
 export function AdminLoginForm({ next }: { next?: string }) {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,7 +25,10 @@ export function AdminLoginForm({ next }: { next?: string }) {
         setLoading(false);
         return;
       }
-      router.replace(next && next.startsWith("/") ? next : "/admin");
+      // Hard navigation (not router.replace) so the freshly-set auth cookie is
+      // sent with the document request — a soft RSC navigation can race the
+      // cookie write and get bounced back to /admin/login on the first try.
+      window.location.assign(next && next.startsWith("/") ? next : "/admin");
     } catch {
       setError("Error de conexión");
       setLoading(false);
