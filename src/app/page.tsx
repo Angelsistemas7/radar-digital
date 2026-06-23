@@ -191,15 +191,6 @@ export default function Home() {
                   </Reveal>
                 ))}
               </ul>
-              <Reveal delay={0.2 + FEATURES.length * 0.1}>
-                <Link
-                  href="/diagnostico"
-                  className={cn(buttonClasses("primary", "md", "mt-8"), "relative overflow-hidden")}
-                >
-                  Empezar ahora <ArrowRight className="size-4" />
-                  <ShineOverlay delay={6} />
-                </Link>
-              </Reveal>
             </div>
           </div>
         </section>
