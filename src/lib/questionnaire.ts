@@ -24,7 +24,9 @@ export const QUESTIONNAIRE: Questionnaire = {
     ],
   },
   // The three answers shown as a traffic light on every question.
-  // value feeds the 0-10 engine: rojo = 0, amarillo = 5, verde = 10.
+  // value feeds the 0-10 engine: rojo = 0, amarillo = 3, verde = 10.
+  // "Más o menos" vale poco (3, no 5): "tal vez / no sé" no es media madurez,
+  // es una capacidad que aún no está en pie. Esto sube la vara honestamente.
   responseOptions: [
     { id: "no", tone: "red", label: "No", hint: "Todavía no", value: 0 },
     {
@@ -32,17 +34,17 @@ export const QUESTIONNAIRE: Questionnaire = {
       tone: "amber",
       label: "Más o menos",
       hint: "Tal vez / no sé",
-      value: 5,
+      value: 3,
     },
     { id: "si", tone: "green", label: "Sí", hint: "Ya lo hacemos", value: 10 },
   ],
   // Qualitative states by color on a 0-10 scale. Las respuestas son
-  // rojo=0 · amarillo=5 · verde=10, así que las bandas se calibran para que
-  // el resultado refleje el semáforo: "casi todo amarillo" (promedio ~5) cae
-  // en AMARILLO, no en rojo. Verde es exigente (hay que tener casi todo en sí).
-  //   rojo:     0   – 2,9   (varios "no": vas mal de verdad)
-  //   amarillo: 3   – 8,9   (centro amplio; incluye el 5)
-  //   verde:    9   – 10    (exigente: casi todo en marcha)
+  // rojo=0 · amarillo=3 · verde=10, con vara exigente: "más o menos" pesa poco.
+  // "Todo más o menos" (promedio 3,0) queda en el PISO del amarillo; el rojo
+  // aparece cuando hay algún "no" que arrastra por debajo de 3. Verde exige sí.
+  //   rojo:     0   – 2,9   (hay "no" de verdad: a activar)
+  //   amarillo: 3   – 7,9   (incluye "todo más o menos"; avance en marcha)
+  //   verde:    8   – 10    (exigente: casi todo consolidado)
   // ⚠️ Cortes centralizados en scoring.ts (BAND_EDGES / levelIndexForScore).
   maturityLevels: [
     {
@@ -57,7 +59,7 @@ export const QUESTIONNAIRE: Questionnaire = {
     {
       id: 2,
       name: "En desarrollo",
-      range: [3, 9],
+      range: [3, 8],
       tagline: "Avanzando con buen pie",
       description:
         "La transformación digital ya está en marcha en varias áreas. El reto es consolidar e integrar lo que funciona.",
@@ -66,7 +68,7 @@ export const QUESTIONNAIRE: Questionnaire = {
     {
       id: 3,
       name: "Consolidado",
-      range: [9, 10.01],
+      range: [8, 10.01],
       tagline: "Referente digital",
       description:
         "Lo digital está integrado en la estrategia y la operación. La empresa puede optimizar con datos y marcar la pauta en su sector.",

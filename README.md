@@ -40,7 +40,7 @@ madurez digital en **4 dimensiones** y entrega un **semáforo digital** (resulta
   datos y consentimiento de datos (Ley 1581 / Habeas Data).
 - **Motor configurable**: dimensiones, preguntas, estados y umbrales viven en
   `src/lib/`; cambia ahí y el resultado se adapta. Los **umbrales del semáforo**
-  (rojo < 3 · amarillo 3–8,9 · verde ≥ 9) están **centralizados** en
+  (rojo < 3 · amarillo 3–7,9 · verde ≥ 8) están **centralizados** en
   `src/lib/scoring.ts` (`BAND_EDGES` / `levelIndexForScore`).
 
 ---

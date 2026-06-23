@@ -27,7 +27,7 @@ export function formatScore(value: number) {
 /* ---- Solid traffic-light color for a 0-10 score ---- */
 
 /** Strong red / amber / green for a 0-10 score (no gradual tones).
- *  Los cortes (2,5 / 8) deben coincidir con BAND_EDGES en scoring.ts. */
+ *  Los cortes (3 / 8) deben coincidir con BAND_EDGES en scoring.ts. */
 export const TRAFFIC_COLORS = {
   red: "#ef4444",
   amber: "#f59e0b",
@@ -36,6 +36,6 @@ export const TRAFFIC_COLORS = {
 
 export function scoreColor(score: number): string {
   if (score < 3) return TRAFFIC_COLORS.red;
-  if (score < 9) return TRAFFIC_COLORS.amber;
+  if (score < 8) return TRAFFIC_COLORS.amber;
   return TRAFFIC_COLORS.green;
 }

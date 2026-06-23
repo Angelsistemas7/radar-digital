@@ -26,25 +26,26 @@ Supabase (Postgres + RLS) · Resend (correos) · IA multi-proveedor
 - `dimensions[]` — las **4 secciones** (estrategia, cultura, cliente, procesos),
   cada una con `id`, `name`, `title`, `icon` (Lucide), `color`, `description`,
   `questions[]` (**2 por dimensión**) y `recommendations` por banda (low/medium/high).
-- `responseOptions[]` — el semáforo: `no`=0 (rojo), `parcial`=5 (amarillo),
-  `si`=10 (verde). El valor alimenta la escala interna 0–10.
-- `maturityLevels[]` — **3 estados** por color: Inicial (**0–6**, rojo), En
-  desarrollo (**6,1–9**, amarillo), Consolidado (**9,1–10**, verde).
+- `responseOptions[]` — el semáforo: `no`=0 (rojo), `parcial`=3 (amarillo),
+  `si`=10 (verde). El valor alimenta la escala interna 0–10. "Más o menos" pesa
+  poco (3) a propósito: "tal vez/no sé" no es media madurez.
+- `maturityLevels[]` — **3 estados** por color: Inicial (**0–2,9**, rojo), En
+  desarrollo (**3–7,9**, amarillo), Consolidado (**8–10**, verde).
   ⚠️ Estos cortes están **duplicados en 3 archivos** (ver «Riesgos»).
 
 ## Colores / semáforo
-- `responseOptions` → respuesta por pregunta (0/5/10): rojo=0, amarillo=5, verde=10.
+- `responseOptions` → respuesta por pregunta (0/3/10): rojo=0, amarillo=3, verde=10.
 - **Bandas centralizadas** en `src/lib/scoring.ts`:
-  - `BAND_EDGES = { redMax: 3, amberMax: 9 }` — **fuente única de los cortes**.
+  - `BAND_EDGES = { redMax: 3, amberMax: 8 }` — **fuente única de los cortes**.
   - `levelIndexForScore(score)` → 0 rojo · 1 amarillo · 2 verde (la luz encendida).
   - `levelForScore(score)` → estado = `maturityLevels[index]`.
-  - Cortes: **rojo < 3 · amarillo 3–8,9 · verde ≥ 9**. Calibrados por el usuario: con
-    respuestas 0/5/10 (mismo peso) el promedio salta de a poco, así que **rojo solo con
-    varios "no"**, **verde exigente** (7 verdes + 1 amarilla = 9,4 → verde; 6 → amarillo),
-    y amarillo es el centro amplio. `maturityLevels[].range` los refleja.
+  - Cortes: **rojo < 3 · amarillo 3–7,9 · verde ≥ 8**. Vara exigente pero justa: con
+    "más o menos"=3, "todo más o menos" (promedio 3,0) queda en el **piso del amarillo**;
+    el **rojo** aparece cuando hay algún "no" arrastrando por debajo de 3. **Verde exigente**
+    (6 verdes + 2 amarillas = 8,25 → verde). `maturityLevels[].range` los refleja.
 - `src/lib/utils.ts → scoreColor(score)` → color **SÓLIDO** (ya no gradual): rojo
   `#ef4444`, ámbar `#f59e0b`, verde `#22c55e`. Lo usan el semáforo, las áreas y el PDF.
-- `bandForScore()` (recomendaciones del PDF/correo): **<3 low, <9 medium, ≥9 high**.
+- `bandForScore()` (recomendaciones del PDF/correo): **<3 low, <8 medium, ≥8 high**.
 
 ## Flujo de una evaluación
 1. **Onboarding** (`components/assessment/onboarding-form.tsx`): datos de la
@@ -102,9 +103,10 @@ src/
 Sobre la versión de los compañeros (rebrand a Semáforo Digital, `semaforo.tsx`,
 nivel educativo, Postgres/Sheets). Qué cambió en este pase y dónde:
 
-- **Fix de bandas** (definidas por el usuario, 2 iteraciones): **rojo <3 · amarillo
-  3–8,9 · verde ≥9** centralizados en `scoring.ts` (`BAND_EDGES`, `levelIndexForScore`).
-  Verde exigente, rojo solo con varios "no". Ver «Colores / semáforo».
+- **Fix de bandas** (definidas por el usuario): **rojo <3 · amarillo 3–7,9 · verde ≥8**
+  centralizados en `scoring.ts` (`BAND_EDGES`, `levelIndexForScore`). "Más o menos"=3
+  (no 5) para subir la vara, pero "todo más o menos" queda en amarillo; el rojo necesita
+  algún "no". Ver «Colores / semáforo».
 - **Onboarding** (`onboarding-form.tsx`): semáforo de **estado** en la esquina sup. der.
   (ámbar por defecto · rojo si hay errores · verde si todo válido, vía `formState`) +
   wash tenue alrededor del formulario que sigue ese color. Campos inválidos con aura roja.
@@ -150,9 +152,9 @@ Resumen para no auditar a ciegas. Qué cambió en esa iteración y dónde:
 ## ⚠️ Riesgos y puntos a vigilar (qué se puede dañar)
 1. **Umbrales ya casi centralizados.** La verdad vive en `scoring.ts → BAND_EDGES`
    (`levelIndexForScore`/`levelForScore`). Aún hay que mantener a mano los espejos:
-   `questionnaire.ts → maturityLevels[].range` (mismos cortes 2,5 / 8) y los hex de
+   `questionnaire.ts → maturityLevels[].range` (mismos cortes 3 / 8) y los hex de
    `utils.ts → scoreColor`. Los cortes **asumen `round1`** (1 decimal): con respuestas
-   0/5/10 no caen promedios justo en 2,5/8, así que no hay empates de frontera.
+   0/3/10 conviene revisar que no caigan promedios justo en 4/8 (empates de frontera).
 2. **El semáforo del PDF es una copia a mano** del de pantalla (`BigTrafficLight` en
    `result-view.tsx` vs. el dibujo jsPDF en `pdf.ts`). **No se sincronizan solos**: si
    cambias colores/forma/tamaño en uno, hay que replicarlo en el otro.

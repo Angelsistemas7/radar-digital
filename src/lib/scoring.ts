@@ -9,11 +9,12 @@ import type {
 import { round1 } from "./utils";
 
 /* Cortes únicos del semáforo (0-10). Fuente de verdad para colores y estados:
-   rojo < 3 · amarillo 3–8,9 · verde ≥ 9. Con respuestas 0/5/10 (mismo peso) el
-   promedio salta de a poco, así que: rojo solo cuando hay varios "no"; verde
-   exigente (7 verdes + 1 amarilla = 9,4 → verde); amarillo es el centro amplio.
+   rojo < 3 · amarillo 3–7,9 · verde ≥ 8. Respuestas 0/3/10: "más o menos" pesa
+   poco (3), así que "todo más o menos" (promedio 3,0) queda en el PISO del amarillo;
+   el rojo aparece cuando hay algún "no" arrastrando por debajo de 3 — sin trucar nada.
+   Verde exige tener casi todo en "sí" (6 verdes + 2 amarillas = 8,25 → verde).
    Mantener alineado con questionnaire.ts → maturityLevels[].range. */
-export const BAND_EDGES = { redMax: 3, amberMax: 9 } as const;
+export const BAND_EDGES = { redMax: 3, amberMax: 8 } as const;
 
 /** Índice de luz encendida del semáforo: 0 rojo · 1 amarillo · 2 verde. */
 export function levelIndexForScore(score: number): 0 | 1 | 2 {
@@ -28,10 +29,10 @@ export function levelForScore(score: number): MaturityLevel {
 }
 
 /** Coarse band used to pick tailored recommendations (PDF/correo).
- *  Un poco más fina que el color para dar recomendaciones de base a quien va flojo. */
+ *  Alineada con los colores del semáforo (BAND_EDGES). */
 export function bandForScore(score: number): RecommendationBand {
-  if (score < 3) return "low";
-  if (score < 9) return "medium";
+  if (score < BAND_EDGES.redMax) return "low";
+  if (score < BAND_EDGES.amberMax) return "medium";
   return "high";
 }
 
