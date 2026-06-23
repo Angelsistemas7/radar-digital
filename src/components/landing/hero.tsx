@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, Clock, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 import { ShineOverlay } from "@/components/ui/shine";
 import { Semaforo, useSemaforoCycle, WASH } from "@/components/ui/semaforo";
@@ -93,22 +93,6 @@ export function Hero() {
             </a>
           </motion.div>
 
-          <motion.ul
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-faint"
-          >
-            <li className="inline-flex items-center gap-1.5">
-              <Clock className="size-4 text-primary" /> ~5 minutos
-            </li>
-            <li className="inline-flex items-center gap-1.5">
-              <BadgeCheck className="size-4 text-primary" /> Resultado inmediato
-            </li>
-            <li className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-primary" /> Sin registro
-            </li>
-          </motion.ul>
         </div>
 
         {/* Semáforo visual — anima de rojo a amarillo a verde */}

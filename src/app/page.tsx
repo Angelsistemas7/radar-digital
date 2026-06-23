@@ -55,8 +55,8 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
 
-        {/* Cómo funciona — envuelto en AmbientSection para que el color del semáforo sangre */}
-        <AmbientSection>
+        {/* Cómo funciona — color ambiental sutil */}
+        <AmbientSection strength={0.4}>
           <section id="como" className="relative mx-auto max-w-6xl scroll-mt-20 px-5 py-20">
             <Reveal className="mx-auto max-w-2xl text-center">
               <Eyebrow>Cómo funciona</Eyebrow>
@@ -97,8 +97,8 @@ export default function Home() {
           </section>
         </AmbientSection>
 
-        {/* Dimensiones — también con color ambiental */}
-        <AmbientSection>
+        {/* Dimensiones — color ambiental ligeramente más suave */}
+        <AmbientSection strength={0.65}>
           <section
             id="dimensiones"
             className="relative scroll-mt-20 border-y border-border/60 bg-surface/40 py-20"

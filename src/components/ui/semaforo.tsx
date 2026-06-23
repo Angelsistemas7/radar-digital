@@ -192,22 +192,27 @@ export function SemaforoCycle({
 export function AmbientSection({
   children,
   className,
+  strength = 1,
 }: {
   children: ReactNode;
   className?: string;
+  /** 0–1: opacidad de los blobs. Úsalo para calibrar la intensidad por sección. */
+  strength?: number;
 }) {
   const { index } = useSemaforoCycle(2200);
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative overflow-hidden", className)}>
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute right-[2%] top-[-5rem] size-[46rem] rounded-full blur-[90px]"
+        className="pointer-events-none absolute right-[2%] top-0 size-[38rem] rounded-full blur-[80px]"
+        style={{ opacity: strength }}
         animate={{ backgroundColor: WASH[index] }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute bottom-[-5rem] left-[2%] size-[46rem] rounded-full blur-[90px]"
+        className="pointer-events-none absolute bottom-0 left-[2%] size-[38rem] rounded-full blur-[80px]"
+        style={{ opacity: strength }}
         animate={{ backgroundColor: WASH[index] }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
       />
