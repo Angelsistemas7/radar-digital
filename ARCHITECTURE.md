@@ -137,13 +137,29 @@ Resumen para no auditar a ciegas. Qué cambió en esta iteración y dónde:
    queda marcada para contacto. Verificar que sea aceptable (Habeas Data / Ley 1581).
 
 ## Despliegue y entorno
-- `git push origin main` → deploy automático en Vercel. **No** usar `vercel` CLI.
-- Variables (Vercel / `.env.local`): `SUPABASE_URL`,
-  `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`,
-  `IP_HASH_SALT`, `RESEND_API_KEY`, `LEAD_NOTIFY_EMAIL`, y una key de IA
-  (`ANTHROPIC_API_KEY` | `GEMINI_API_KEY` | `GROQ_API_KEY` | `OPENROUTER_API_KEY`).
-- Local: `npm install` · `npm run dev` (localhost:3000) · `npm run build`.
-- Atajo: doble clic en `Iniciar Radar Digital.bat` (carpeta raíz).
+**Despliegue auto-hospedado en VPS, ya NO Vercel** — lo montó @Manuel (commits
+`8cad3fa`, `7accffd`). Dominio: **semaforodigital.com**.
+
+- **Modelo**: Docker (Next.js `output: "standalone"`, `Dockerfile`) → contenedor en
+  `127.0.0.1:3000` → **nginx** (80/443, `nginx/semaforodigital.com.conf`) → **Certbot**
+  (SSL). Orquesta `docker-compose.yml`. VPS `158.101.105.13`, app en `/opt/radar-digital`.
+- **CI/CD**: `git push origin main` dispara `.github/workflows/deploy.yml`, que entra por
+  SSH al VPS y corre `git pull` + `docker compose up -d --build`. Requiere secrets de
+  GitHub: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`.
+- **Deploy manual** (alternativa): `bash scripts/deploy.sh` (rsync + rebuild por SSH);
+  preparación inicial del servidor con `scripts/setup-vps.sh` (Docker, nginx, Certbot).
+- **Variables de entorno**: en el VPS, archivo **`.env.production`** (lo lee
+  `docker-compose.yml` con `env_file`), **no** en Vercel. Vars: `SUPABASE_URL`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, `IP_HASH_SALT`,
+  `RESEND_API_KEY`, `LEAD_NOTIFY_EMAIL`, y opcional una key de IA.
+- **Local**: `npm install` · `npm run dev` (localhost:3000) · `npm run build`.
+  ⚠️ Se añadió la dependencia `qrcode`: corre `npm install` para sincronizar `node_modules`.
+- Atajo local: doble clic en `Iniciar Radar Digital.bat`.
+
+> ⚠️ Coexisten **dos** mecanismos de deploy: GitHub Actions hace `git pull` en el VPS
+> (despliega lo que está en GitHub), mientras `scripts/deploy.sh` hace `rsync` desde tu
+> máquina (sube tus archivos locales, incluso sin commitear). Usa uno u otro con cuidado
+> para no desincronizar el VPS.
 
 ## Backups
 Tags de git marcan estados estables. P. ej. `v1-8dimensiones` = versión previa

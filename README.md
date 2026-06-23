@@ -106,16 +106,22 @@ públicas: todo el acceso pasa por el servidor con la *service role key*.
 
 ---
 
-## ☁️ Despliegue en Vercel
+## ☁️ Despliegue (VPS auto-hospedado)
 
-1. Sube el proyecto a GitHub.
-2. En [vercel.com](https://vercel.com) → **New Project** → importa el repo.
-3. **Importante**: si el repo contiene la carpeta `radar-digital`, configura
-   **Root Directory = `radar-digital`**.
-4. Agrega las **variables de entorno** (las mismas de `.env.local`).
-5. Deploy. Comparte el enlace `https://tu-proyecto.vercel.app` 🎉
+> El proyecto **ya no se despliega en Vercel**. Se montó un despliegue propio
+> (Docker + nginx + GitHub Actions) sobre **semaforodigital.com**.
 
-> Vercel sirve la app por HTTPS, por lo que HSTS y las cookies `secure` quedan activas.
+- **Automático**: cada `git push origin main` dispara
+  [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml), que entra por SSH
+  al VPS y hace `git pull` + `docker compose up -d --build`.
+- **Manual**: `bash scripts/deploy.sh` desde tu máquina; primer arranque del servidor
+  con `scripts/setup-vps.sh`.
+- **Variables de entorno**: viven en el VPS en `.env.production` (no en Vercel).
+- Detalles, mecanismos y avisos: ver [`ARCHITECTURE.md`](./ARCHITECTURE.md) →
+  «Despliegue y entorno».
+
+> El HTTPS lo da **nginx + Certbot** en el VPS, así que HSTS y las cookies `secure`
+> siguen activas en producción.
 
 ---
 
