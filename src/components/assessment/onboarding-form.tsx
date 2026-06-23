@@ -290,7 +290,7 @@ export function OnboardingForm({
             />
             <span className="text-sm text-muted">
               Autorizo el tratamiento de mis datos personales para la medición de
-              madurez digital de mi emprendimiento, conforme a la{" "}
+              madurez digital de mi empresa, conforme a la{" "}
               <a
                 href="/privacidad"
                 target="_blank"
@@ -313,7 +313,7 @@ export function OnboardingForm({
           cifrados
         </p>
         <button type="submit" className={buttonClasses("primary", "lg", "w-full sm:w-auto")}>
-          Comenzar el diagnóstico <ArrowRight className="size-5" />
+          Iniciar autodiagnóstico <ArrowRight className="size-5" />
         </button>
       </div>
       </form>
