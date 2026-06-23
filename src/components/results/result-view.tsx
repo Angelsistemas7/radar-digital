@@ -296,8 +296,8 @@ export function ResultView({
               <h2 className="text-xl font-bold tracking-tight">Da el siguiente paso</h2>
             </div>
             <p className="mt-2 max-w-2xl text-sm text-muted">
-              Nuestro equipo te contactará para acompañarte a convertir este diagnóstico
-              en resultados reales — sin costo y sin compromiso.
+              Nuestro equipo te contactará para acompañarte a convertir este autodiagnóstico
+              en resultados reales.
             </p>
 
             <ul className="mt-5 grid gap-3 sm:grid-cols-3">
