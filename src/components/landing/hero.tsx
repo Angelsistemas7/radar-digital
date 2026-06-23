@@ -73,9 +73,8 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.12, ease: EASE }}
             className="mt-6 max-w-md text-lg leading-relaxed text-muted"
           >
-            Responde con un semáforo —sí, más o menos o no— y al instante conoce
-            el nivel de madurez digital de tu empresa, área por área, con la
-            claridad de un semáforo.
+            Al instante conoce el nivel de madurez digital de tu empresa, área
+            por área, con la claridad de un semáforo.
           </motion.p>
 
           <motion.div
