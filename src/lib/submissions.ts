@@ -126,7 +126,7 @@ export async function saveSubmission(
 
 /** True when running without a database (admin shows sample data). */
 export function isDemoMode(): boolean {
-  return !isSupabaseConfigured();
+  return !isSupabaseConfigured() && !getDb();
 }
 
 function mulberry32(seed: number) {
@@ -206,15 +206,29 @@ function demoRows(): SubmissionRow[] {
 }
 
 export async function listSubmissions(): Promise<SubmissionRow[]> {
+  // 1. Supabase (prioridad si está configurado)
   const supabase = getSupabaseAdmin();
-  if (!supabase) return demoRows();
-  const { data, error } = await supabase
-    .from("submissions")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(2000);
-  if (error) throw new Error(error.message);
-  return (data ?? []) as SubmissionRow[];
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as SubmissionRow[];
+  }
+
+  // 2. PostgreSQL local
+  const db = getDb();
+  if (db) {
+    const result = await db.query(
+      "SELECT * FROM public.submissions ORDER BY created_at DESC LIMIT 2000",
+    );
+    return result.rows as SubmissionRow[];
+  }
+
+  // 3. Sin base de datos — datos de ejemplo
+  return demoRows();
 }
 
 /* ---------- aggregates for the admin dashboard ---------- */

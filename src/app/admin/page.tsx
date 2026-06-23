@@ -27,9 +27,9 @@ import { SubmissionsTable } from "@/components/admin/submissions-table";
 import {
   listSubmissions,
   summarize,
+  isDemoMode,
   type SubmissionRow,
 } from "@/lib/submissions";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
 import { verifySessionToken, ADMIN_COOKIE } from "@/lib/admin-auth";
 import { formatScore } from "@/lib/utils";
 
@@ -74,7 +74,7 @@ export default async function AdminPage() {
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
   if (!verifySessionToken(token)) redirect("/admin/login");
 
-  const configured = isSupabaseConfigured();
+  const configured = !isDemoMode();
   let rows: SubmissionRow[] = [];
   let dbError: string | null = null;
   try {
