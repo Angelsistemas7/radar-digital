@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Sora } from "next/font/google";
 import { MotionProvider } from "@/components/motion-provider";
+import { ScrollRestorationFix } from "@/components/scroll-restoration-fix";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -75,6 +76,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <ScrollRestorationFix />
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
