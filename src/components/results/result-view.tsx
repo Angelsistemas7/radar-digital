@@ -293,7 +293,7 @@ export function ResultView({
           <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
           <div className="relative">
             <div className="flex items-center gap-2">
-              <Handshake className="size-5 text-accent" />
+              <Handshake className="size-5 text-primary" />
               <h2 className="text-xl font-bold tracking-tight">Da el siguiente paso</h2>
             </div>
             <p className="mt-2 max-w-2xl text-sm text-muted">
