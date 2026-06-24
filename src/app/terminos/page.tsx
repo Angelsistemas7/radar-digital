@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Términos de uso",
-  description: "Términos y condiciones de uso de Semáforo Digital.",
+  description: `Términos y condiciones de uso de ${BRAND.name}.`,
 };
 
 function H2({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export default function TerminosPage() {
 
         <H2>1. Objeto</H2>
         <P>
-          Semáforo Digital es una herramienta para autoevaluar la madurez digital de
+          {BRAND.name} es una herramienta para autoevaluar la madurez digital de
           un emprendimiento o empresa y obtener un diagnóstico y un plan de acción
           orientativo.
         </P>

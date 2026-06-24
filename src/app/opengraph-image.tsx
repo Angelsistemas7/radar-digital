@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
+import { BRAND } from "@/lib/brand";
 
-export const alt = "Semáforo Digital — Diagnóstico de Madurez Digital";
+export const alt = `${BRAND.name} — Diagnóstico de Madurez Digital`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -47,7 +48,7 @@ export default function Image() {
             <div style={{ width: 12, height: 12, borderRadius: 6, background: "#f59e0b" }} />
             <div style={{ width: 12, height: 12, borderRadius: 6, background: "#22c55e", boxShadow: "0 0 8px #22c55e" }} />
           </div>
-          SEMÁFORO DIGITAL
+          {BRAND.name.toUpperCase()}
         </div>
 
         <div

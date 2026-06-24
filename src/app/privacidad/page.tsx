@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Política de Tratamiento de Datos Personales",
-  description:
-    "Política de privacidad y tratamiento de datos personales de Semáforo Digital, conforme a la Ley 1581 de 2012 (Colombia).",
+  description: `Política de privacidad y tratamiento de datos personales de ${BRAND.name}, conforme a la Ley 1581 de 2012 (Colombia).`,
 };
 
 const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "privacidad@semaforodigital.online";
@@ -34,7 +34,7 @@ export default function PrivacidadPage() {
 
         <H2>1. Responsable del tratamiento</H2>
         <P>
-          Semáforo Digital es responsable del tratamiento de los datos personales
+          {BRAND.legalEntity} es responsable del tratamiento de los datos personales
           recolectados a través de este sitio. Para cualquier solicitud
           relacionada con tus datos, escríbenos a{" "}
           <a className="text-primary underline" href={`mailto:${CONTACT}`}>

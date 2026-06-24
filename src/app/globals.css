@@ -193,6 +193,21 @@
 :root {
   color-scheme: light;
 }
+
+/* ============================================================
+   Marca UTB — Universidad Tecnológica de Bolívar.
+   Mismo tema claro (fondo blanco), re-tiñendo primario→navy y
+   acento→teal institucional. Las utilidades de Tailwind v4 leen
+   estas variables, así que botones, text-gradient y glows se
+   actualizan solos.
+   ============================================================ */
+[data-brand="utb"] {
+  --color-primary: #003087;          /* navy UTB */
+  --color-primary-foreground: #ffffff;
+  --color-accent: #14b8a6;           /* teal UTB (legible sobre blanco) */
+  --color-accent-foreground: #ffffff;
+}
+
 .dark {
   color-scheme: dark;
   --color-background: #070a12;

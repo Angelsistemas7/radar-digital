@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Sora } from "next/font/google";
 import { MotionProvider } from "@/components/motion-provider";
 import { ScrollRestorationFix } from "@/components/scroll-restoration-fix";
+import { BRAND } from "@/lib/brand";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,33 +22,32 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://semaforodigital.online"),
+  metadataBase: new URL(`https://${BRAND.domain}`),
   title: {
-    default: "Semáforo Digital — Diagnóstico de Madurez Digital",
-    template: "%s · Semáforo Digital",
+    default: `${BRAND.name} — Diagnóstico de Madurez Digital`,
+    template: `%s · ${BRAND.name}`,
   },
-  description:
-    "Mide la madurez digital de tu empresa en 4 dimensiones y recibe un plan de acción personalizado para impulsar tu transformación digital.",
-  applicationName: "Semáforo Digital",
+  description: BRAND.description,
+  applicationName: BRAND.name,
   keywords: [
     "madurez digital",
     "transformación digital",
     "diagnóstico empresarial",
-    "Semáforo Digital",
+    BRAND.name,
   ],
-  authors: [{ name: "Semáforo Digital" }],
+  authors: [{ name: BRAND.legalEntity }],
   openGraph: {
-    title: "Semáforo Digital — Diagnóstico de Madurez Digital",
+    title: `${BRAND.name} — Diagnóstico de Madurez Digital`,
     description:
       "Descubre las fortalezas y debilidades digitales de tu empresa con un diagnóstico de 4 dimensiones.",
-    siteName: "Semáforo Digital",
-    url: "https://semaforodigital.online",
+    siteName: BRAND.name,
+    url: `https://${BRAND.domain}`,
     type: "website",
     locale: "es_CO",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Semáforo Digital — Diagnóstico de Madurez Digital",
+    title: `${BRAND.name} — Diagnóstico de Madurez Digital`,
     description:
       "Mide la madurez digital de tu empresa en 4 dimensiones y recibe un plan de acción.",
   },
@@ -70,6 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      data-brand={BRAND.key}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}

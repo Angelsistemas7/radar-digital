@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoLockup } from "@/components/ui/logo";
+import { BRAND } from "@/lib/brand";
 
 export function SiteFooter() {
   return (
@@ -11,7 +12,7 @@ export function SiteFooter() {
           de 2012 (Habeas Data).
           <br className="hidden sm:block" />
           <span className="text-muted">
-            © {new Date().getFullYear()} Semáforo Digital.
+            © {new Date().getFullYear()} {BRAND.legalEntity}.
           </span>{" "}
           <Link href="/privacidad" className="underline-offset-4 hover:text-muted hover:underline">
             Privacidad

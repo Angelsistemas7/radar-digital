@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LogoLockup } from "@/components/ui/logo";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Acceso administrador",
@@ -25,7 +26,7 @@ export default async function AdminLoginPage({
         <AdminLoginForm next={next} />
       </div>
       <p className="relative mt-6 text-xs text-faint">
-        Acceso restringido · Semáforo Digital
+        Acceso restringido · {BRAND.name}
       </p>
     </main>
   );

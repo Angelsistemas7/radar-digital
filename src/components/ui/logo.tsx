@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/lib/brand";
 
 /** Semáforo Digital brand mark — a traffic light with red/amber/green lamps. */
 export function Logo({
@@ -42,8 +43,18 @@ export function Logo({
   );
 }
 
-/** Logo + wordmark lockup for headers. */
+/** Logo + wordmark lockup for headers. Switches by active brand. */
 export function LogoLockup({ className }: { className?: string }) {
+  if (BRAND.logo === "utb") {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src="/utb-logo.svg"
+        alt={BRAND.legalEntity}
+        className={cn("h-8 w-auto", className)}
+      />
+    );
+  }
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <Logo size={32} />

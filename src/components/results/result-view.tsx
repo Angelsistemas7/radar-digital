@@ -18,6 +18,7 @@ import {
 import { DimensionIcon } from "@/components/ui/dimension-icon";
 import { Semaforo } from "@/components/ui/semaforo";
 import { Reveal } from "@/components/ui/reveal";
+import { BRAND } from "@/lib/brand";
 import { buttonClasses } from "@/components/ui/button";
 import { generateDiagnosis } from "@/lib/diagnosis";
 import { clearState } from "@/lib/storage";
@@ -191,7 +192,7 @@ export function ResultView({
       {/* print-only report header */}
       <div className="mb-6 hidden print:block">
         <div className="flex items-center justify-between border-b border-[#d9dee8] pb-3">
-          <span className="font-display text-lg font-bold">Semáforo Digital</span>
+          <span className="font-display text-lg font-bold">{BRAND.name}</span>
           <span className="text-sm">
             Reporte de Madurez Digital ·{" "}
             {new Date().toLocaleDateString("es-CO", {

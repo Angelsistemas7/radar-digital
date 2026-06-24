@@ -34,6 +34,7 @@ import {
   isDemoMode,
   type SubmissionRow,
 } from "@/lib/submissions";
+import { BRAND } from "@/lib/brand";
 import { verifySessionToken, ADMIN_COOKIE } from "@/lib/admin-auth";
 import { formatScore } from "@/lib/utils";
 
@@ -95,7 +96,7 @@ export default async function AdminPage() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <Link href="/" aria-label="Semáforo Digital — inicio">
+            <Link href="/" aria-label={`${BRAND.name} — inicio`}>
               <LogoLockup />
             </Link>
             <span className="hidden rounded-full bg-elevated px-2.5 py-1 text-xs text-muted sm:inline">
