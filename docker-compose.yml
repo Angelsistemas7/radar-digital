@@ -1,6 +1,11 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        # Marca de ESTE despliegue (build-time). Cambiar a "semaforo" para el
+        # sitio público; requiere rebuild (docker compose up -d --build).
+        NEXT_PUBLIC_BRAND: utb
     restart: unless-stopped
     env_file: .env.production
     ports:

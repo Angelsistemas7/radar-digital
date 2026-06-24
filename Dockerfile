@@ -17,6 +17,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Marca activa (white-label). NEXT_PUBLIC_* es build-time: se hornea aquí.
+ARG NEXT_PUBLIC_BRAND=utb
+ENV NEXT_PUBLIC_BRAND=$NEXT_PUBLIC_BRAND
 RUN npm run build
 
 # ——— Stage 3: production runner ——————————————————————————————
