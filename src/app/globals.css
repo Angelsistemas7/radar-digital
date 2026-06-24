@@ -5,9 +5,9 @@
    Light, professional, editorial palette (deep teal + indigo).
    ============================================================ */
 @theme {
-  /* Fonts (variables injected by next/font in layout.tsx) */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sora), var(--font-geist-sans), sans-serif;
+  /* Fonts (variables injected by next/font in layout.tsx) — UTB usa Roboto */
+  --font-sans: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /* Surfaces */
