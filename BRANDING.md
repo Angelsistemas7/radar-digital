@@ -65,13 +65,11 @@ Reinicia el dev server (`npm run dev`). Listo.
 - el `.dockerignore` excluye `.env*` del build, y
 - `NEXT_PUBLIC_*` se inyecta al **construir la imagen**, no al ejecutar el contenedor.
 
-Hay que pasarla como **build ARG**. Edita el `Dockerfile` (stage `builder`, antes
-de `npm run build`):
-```dockerfile
-ARG NEXT_PUBLIC_BRAND=utb
-ENV NEXT_PUBLIC_BRAND=$NEXT_PUBLIC_BRAND
-```
-Y en `docker-compose.yml` del despliegue:
+Se pasa como **build ARG**, que **ya está cableado** en el repo:
+- `Dockerfile` (stage `builder`): `ARG NEXT_PUBLIC_BRAND=utb` + `ENV` antes de `npm run build`.
+- `docker-compose.yml` (servicio `app`): `build.args.NEXT_PUBLIC_BRAND` (default `utb`).
+
+Para cambiar la marca de un despliegue, edita el valor en `docker-compose.yml`:
 ```yaml
 services:
   app:
@@ -83,6 +81,10 @@ services:
 Luego reconstruye:
 ```bash
 docker compose up -d --build
+```
+O sin editar el compose, con un override puntual:
+```bash
+docker compose build --build-arg NEXT_PUBLIC_BRAND=semaforo && docker compose up -d
 ```
 
 > **Variables runtime vs build-time:** `DATABASE_URL`, `ADMIN_PASSWORD`, etc. son
