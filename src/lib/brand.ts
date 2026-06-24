@@ -26,6 +26,10 @@ export interface Brand {
   description: string;
   /** Tipo de logo a renderizar en el lockup. */
   logo: "semaforo" | "utb";
+  /** Logo de co-marca opcional (socio/escuela) — se muestra en el footer. */
+  partnerLogo?: string;
+  /** Nombre del co-branding (texto alternativo del logo). */
+  partnerName?: string;
 }
 
 export const BRANDS: Record<BrandKey, Brand> = {
@@ -48,6 +52,8 @@ export const BRANDS: Record<BrandKey, Brand> = {
     description:
       "Mide la madurez digital de tu empresa en 4 dimensiones y recibe un plan de acción para impulsar tu transformación digital.",
     logo: "utb",
+    partnerLogo: "/escuela-td-logo.png",
+    partnerName: "Escuela de Transformación Digital",
   },
 };
 
