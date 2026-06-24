@@ -81,7 +81,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Estrategia",
       title: "Estrategia Digital",
       icon: "Target",
-      color: "#0e7490",
+      color: "#003087",
       description:
         "Visión, liderazgo y hoja de ruta que guían la transformación digital.",
       questions: [
@@ -117,7 +117,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Cultura",
       title: "Cultura y Talento Digital",
       icon: "Users",
-      color: "#4f46e5",
+      color: "#14b8a6",
       description:
         "Competencias, capacitación y cultura de innovación del equipo.",
       questions: [
@@ -153,7 +153,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Cliente",
       title: "Experiencia del Cliente",
       icon: "HeartHandshake",
-      color: "#db2777",
+      color: "#4f46e5",
       description:
         "Canales digitales, escucha y personalización en la relación con el cliente.",
       questions: [
@@ -189,7 +189,7 @@ export const QUESTIONNAIRE: Questionnaire = {
       name: "Procesos",
       title: "Procesos y Operaciones",
       icon: "Workflow",
-      color: "#d97706",
+      color: "#0e7490",
       description:
         "Digitalización, automatización e integración de la operación.",
       questions: [

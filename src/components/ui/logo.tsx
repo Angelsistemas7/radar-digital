@@ -51,7 +51,7 @@ export function LogoLockup({ className }: { className?: string }) {
       <img
         src="/utb-logo.svg"
         alt={BRAND.legalEntity}
-        className={cn("h-8 w-auto", className)}
+        className={cn("h-11 w-auto", className)}
       />
     );
   }
