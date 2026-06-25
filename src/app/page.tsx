@@ -120,34 +120,37 @@ export default function Home() {
                   const delay = Math.floor(i / 2) * 0.25 + (i % 2) * 0.1;
                   return (
                     <Reveal key={d.id} delay={delay} duration={0.7}>
-                      <div className="group card-hover glass relative h-full overflow-hidden rounded-2xl p-6">
+                      <div
+                        className="group relative h-full overflow-hidden rounded-3xl p-6 transition-transform duration-300 hover:-translate-y-1.5"
+                        style={{
+                          background: "linear-gradient(160deg, #06224d 0%, #031331 100%)",
+                          boxShadow: "0 22px 44px -26px rgba(0,0,0,0.65)",
+                        }}
+                      >
+                        {/* glow de acento en el color de la dimensión */}
                         <span
                           aria-hidden
-                          className="absolute inset-x-0 top-0 h-1"
+                          className="pointer-events-none absolute -right-12 -top-12 size-32 rounded-full opacity-40 blur-3xl transition-opacity duration-300 group-hover:opacity-75"
                           style={{ backgroundColor: d.color }}
-                        />
-                        <span
-                          aria-hidden
-                          className="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 max-sm:opacity-60"
-                          style={{ backgroundColor: `${d.color}33` }}
                         />
                         <div className="relative flex items-center justify-between">
                           <span
-                            className="flex size-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110"
+                            className="flex size-12 items-center justify-center rounded-2xl text-white ring-1 ring-white/25 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110"
                             style={{
-                              backgroundColor: `${d.color}1f`,
-                              color: d.color,
-                              boxShadow: `0 6px 16px -8px ${d.color}`,
+                              backgroundColor: d.color,
+                              boxShadow: `0 8px 20px -8px ${d.color}`,
                             }}
                           >
-                            <DimensionIcon name={d.icon} className="size-5" />
+                            <DimensionIcon name={d.icon} className="size-6" />
                           </span>
-                          <span className="font-mono text-xs text-faint">
+                          <span className="font-mono text-xs text-white/40">
                             Área {String(i + 1).padStart(2, "0")}
                           </span>
                         </div>
-                        <h3 className="relative mt-4 font-semibold">{d.title}</h3>
-                        <p className="relative mt-1.5 text-sm text-muted">{d.description}</p>
+                        <h3 className="relative mt-5 text-lg font-bold text-white">{d.title}</h3>
+                        <p className="relative mt-2 text-sm leading-relaxed text-white/70">
+                          {d.description}
+                        </p>
                       </div>
                     </Reveal>
                   );
