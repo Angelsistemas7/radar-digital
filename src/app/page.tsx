@@ -31,7 +31,7 @@ const STEPS = [
   },
 ];
 
-const STEP_COLORS = ["#0e7490", "#4f46e5", "#16a34a"];
+const STEP_COLORS = ["#0fc5ed", "#1d4ed8", "#0d9488"];
 
 const FEATURES = [
   "Autodiagnóstico visual de las 4 dimensiones",
@@ -69,26 +69,33 @@ export default function Home() {
                 const c = STEP_COLORS[i] ?? "#0e7490";
                 return (
                   <Reveal key={step.title} delay={i * 0.2} duration={0.8}>
-                    <div className="group card-hover glass relative h-full overflow-hidden rounded-2xl p-5 sm:p-6">
-                      {/* top accent */}
-                      <span aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: c }} />
-                      {/* corner glow */}
+                    <div
+                      className="group relative h-full overflow-hidden rounded-3xl p-6 transition-transform duration-300 hover:-translate-y-1.5"
+                      style={{
+                        background:
+                          "linear-gradient(155deg, color-mix(in oklab, var(--color-primary) 82%, #03103a) 0%, color-mix(in oklab, var(--color-primary) 38%, #03103a) 100%)",
+                        boxShadow: "0 22px 44px -26px rgba(0,0,0,0.55)",
+                      }}
+                    >
+                      {/* glow de acento en el color del paso */}
                       <span
                         aria-hidden
-                        className="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 max-sm:opacity-60"
-                        style={{ backgroundColor: `${c}33` }}
+                        className="pointer-events-none absolute -right-12 -top-12 size-32 rounded-full opacity-40 blur-3xl transition-opacity duration-300 group-hover:opacity-75"
+                        style={{ backgroundColor: c }}
                       />
-                      <div
-                        className="relative flex size-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110"
-                        style={{ backgroundColor: `${c}1f`, color: c, boxShadow: `0 6px 16px -8px ${c}` }}
+                      <span
+                        className="relative flex size-12 items-center justify-center rounded-2xl text-white ring-1 ring-white/25 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110"
+                        style={{ backgroundColor: c, boxShadow: `0 8px 20px -8px ${c}` }}
                       >
-                        <step.icon className="size-5" />
+                        <step.icon className="size-6" />
+                      </span>
+                      <div className="relative mt-5 flex items-center gap-2">
+                        <span className="font-mono text-sm text-white/40">0{i + 1}</span>
+                        <h3 className="text-base font-bold text-white">{step.title}</h3>
                       </div>
-                      <div className="relative mt-4 flex items-center gap-2">
-                        <span className="font-mono text-sm text-faint">0{i + 1}</span>
-                        <h3 className="text-base font-semibold">{step.title}</h3>
-                      </div>
-                      <p className="relative mt-2 text-sm text-muted">{step.text}</p>
+                      <p className="relative mt-2 text-sm leading-relaxed text-white/70">
+                        {step.text}
+                      </p>
                     </div>
                   </Reveal>
                 );
@@ -123,8 +130,9 @@ export default function Home() {
                       <div
                         className="group relative h-full overflow-hidden rounded-3xl p-6 transition-transform duration-300 hover:-translate-y-1.5"
                         style={{
-                          background: "linear-gradient(160deg, #06224d 0%, #031331 100%)",
-                          boxShadow: "0 22px 44px -26px rgba(0,0,0,0.65)",
+                          background:
+                            "linear-gradient(155deg, color-mix(in oklab, var(--color-primary) 82%, #03103a) 0%, color-mix(in oklab, var(--color-primary) 38%, #03103a) 100%)",
+                          boxShadow: "0 22px 44px -26px rgba(0,0,0,0.55)",
                         }}
                       >
                         {/* glow de acento en el color de la dimensión */}
